@@ -6,6 +6,7 @@ dependencies:
   - pip:
     - ipykernel
     - jupyterlab
+    - shap==0.41.0
     - pandas==1.5.0
     - matplotlib==3.6.0
     - statsmodels==0.13.2
