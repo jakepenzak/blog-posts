@@ -1,0 +1,16 @@
+name: Blog-Posts
+dependencies:
+  - python
+  - git
+  - pip
+  - pip:
+    - ipykernel
+    - jupyterlab
+    - pandas==1.5.0
+    - matplotlib==3.6.0
+    - statsmodels==0.13.2
+    - seaborn==0.12.0
+    - numpy==1.23.0
+    - scipy==1.9.1
+    - stargazer==0.0.5
+    - scikit-learn==1.1.2
