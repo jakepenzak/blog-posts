@@ -1,4 +1,4 @@
-# Blog-Posts
+# Medium Blog Posts
 
 ## Purpose
 
