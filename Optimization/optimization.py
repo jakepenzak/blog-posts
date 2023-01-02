@@ -99,8 +99,10 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
 
     x_star = {}
     x_star[0] = np.array(list(x0.values())[:-1])
-    
+
     optimal_solutions = []
+    optimal_solutions.append(dict(zip(list(x0.keys())[:-1],x_star[0])))
+
     duality = 10e5
     while duality > 10e-5:
 
@@ -116,7 +118,7 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
         i=0
         while i < iterations:
             i += 1
-
+        
             gradient = get_gradient(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
             hessian = get_hessian(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
 
