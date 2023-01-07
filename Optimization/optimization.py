@@ -15,20 +15,21 @@ def gradient_descent(function,symbols,x0,learning_rate=0.1,iterations=100,mute=F
 
     i=0
     while i < iterations:
-        i += 1
 
-        x.append(dict(zip(x0.keys(),x_star[i-1])))
+        x.append(dict(zip(x0.keys(),x_star[i])))
 
-        gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i-1])))
+        gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i])))
 
-        x_star[i] = x_star[i-1].T - learning_rate*gradient.T
+        x_star[i+1] = x_star[i].T - learning_rate*gradient.T
 
-        if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-7 and i != 1:
-            print(f"\nConvergence Achieved ({i} iterations): Solution = {x_star[i]}")
+        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-7 and i != 1:
+            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {dict(zip(x0.keys(),x_star[i+1]))}")
             break 
 
         if not mute:
-            print(f"Step {i}: {x_star[i]}")
+            print(f"Step {i+1}: {x_star[i+1]}")
+
+        i += 1
         
     return x
 
@@ -46,21 +47,22 @@ def newton_method(function,symbols,x0,iterations=100,mute=False):
 
     i=0
     while i < iterations:
-        i += 1
 
-        x.append(dict(zip(x0.keys(),x_star[i-1])))
+        x.append(dict(zip(x0.keys(),x_star[i])))
 
-        gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i-1])))
-        hessian = get_hessian(function, symbols, dict(zip(x0.keys(),x_star[i-1])))
+        gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i])))
+        hessian = get_hessian(function, symbols, dict(zip(x0.keys(),x_star[i])))
 
-        x_star[i] = x_star[i-1].T - np.dot(np.linalg.inv(hessian),gradient.T)
+        x_star[i+1] = x_star[i].T - np.dot(np.linalg.inv(hessian),gradient.T)
 
-        if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-7 and i != 1:
-            print(f"\nConvergence Achieved ({i} iterations): Solution = {x_star[i]}")
+        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-7 and i != 1:
+            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {dict(zip(x0.keys(),x_star[i+1]))}")
             break
 
         if not mute:
-            print(f"Step {i}: {x_star[i]}")
+            print(f"Step {i+1}: {x_star[i+1]}")
+
+        i += 1
 
     return x
 
