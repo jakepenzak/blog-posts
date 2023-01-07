@@ -16,4 +16,3 @@ dependencies:
     - stargazer==0.0.5
     - scikit-learn==1.1.2
     - sympy==1.11.1
-    - 
