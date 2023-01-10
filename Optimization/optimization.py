@@ -105,18 +105,21 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
     optimal_solutions = []
     optimal_solutions.append(dict(zip(list(x0.keys())[:-1],x_star[0])))
 
-    duality = 10e5
-    while duality > 10e-5:
+    step = 1 
+    while True:
+        
+        # Evaluate function at rho value
+        if step == 1: # starting rho
+            rho_sub = list(x0.values())[-1]
 
-        # Evaluate function at new t value
-        if duality == 10e5:
-            t_sub = list(x0.values())[-1]
-        t_sub_values = {list(x0.keys())[-1]:t_sub}
-        function_eval = function.evalf(subs=t_sub_values)
+        rho_sub_values = {list(x0.keys())[-1]:rho_sub}
+        function_eval = function.evalf(subs=rho_sub_values)
 
         if not mute:
+                print(f"Step {step} w/ {rho_sub_values}") # Barrier method step
                 print(f"Starting Values: {x_star[0]}")
-
+        
+        # Newton's Method
         i=0
         while i < iterations:
             i += 1
@@ -126,23 +129,29 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
 
             x_star[i] = x_star[i-1].T - np.dot(np.linalg.inv(hessian),gradient.T)
 
-            if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-7 and i != 1:
-                print(f"Convergence Achieved ({i} iterations): Solution = {x_star[i]}\n")
+            if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-5 and i != 1:
+                print(f"Convergence Achieved ({i} iterations): Solution = {dict(zip(list(x0.keys())[:-1],x_star[i]))}\n") 
                 break
         
-        # Record optimal solution for each overall NM convergence
+        # Record optimal solution for each barrier method iteration
         optimal_solution = x_star[i]
         optimal_solutions.append(dict(zip(list(x0.keys())[:-1],optimal_solution)))
+        
+        # Check for overall convergence
+        previous_optimal_solution = list(optimal_solutions[step-2].values())
+        if step != 1 and np.linalg.norm(optimal_solution - previous_optimal_solution) < 10e-5:
+            print(f"\n Overall Convergence Achieved ({step} steps): Solution = {dict(zip(list(x0.keys())[:-1],optimal_solution))}\n")
+            break
 
         # Set new starting point
         x_star = {}
         x_star[0] = optimal_solution
 
-        # Update t-value
-        t_sub = (1+1/(13*np.sqrt(0.01)))*t_sub
+        # Update rho
+        rho_sub = 0.9*rho_sub
 
-        # Update duality
-        duality = 2/t_sub
+        # Update Steps
+        step += 1
 
     return optimal_solutions
 
