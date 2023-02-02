@@ -53,7 +53,7 @@ def newton_method(function,symbols,x0,iterations=100,mute=False):
         gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i])))
         hessian = get_hessian(function, symbols, dict(zip(x0.keys(),x_star[i])))
 
-        x_star[i+1] = x_star[i].T - np.dot(np.linalg.inv(hessian),gradient.T)
+        x_star[i+1] = x_star[i].T - np.linalg.inv(hessian) @ gradient.T
 
         if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-7 and i != 1:
             print(f"\nConvergence Achieved ({i+1} iterations): Solution = {dict(zip(x0.keys(),x_star[i+1]))}")
@@ -106,7 +106,7 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
     optimal_solutions.append(dict(zip(list(x0.keys())[:-1],x_star[0])))
 
     step = 1 
-    while True:
+    while step < iterations:
         
         # Evaluate function at rho value
         if step == 1: # starting rho
@@ -127,7 +127,7 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
             gradient = get_gradient(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
             hessian = get_hessian(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
 
-            x_star[i] = x_star[i-1].T - np.dot(np.linalg.inv(hessian),gradient.T)
+            x_star[i] = x_star[i-1].T - np.linalg.inv(hessian) @ gradient.T
 
             if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-5 and i != 1:
                 print(f"Convergence Achieved ({i} iterations): Solution = {dict(zip(list(x0.keys())[:-1],x_star[i]))}\n") 
