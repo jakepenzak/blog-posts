@@ -8,7 +8,7 @@ def gradient_descent(function,symbols,x0,learning_rate=0.1,iterations=100,mute=F
     x_star = {}
     x_star[0] = np.array(list(x0.values()))
 
-    x = []
+    # x = [] ## Return x for visual!
 
     if not mute:
         print(f"Starting Values: {x_star[0]}")
@@ -16,22 +16,25 @@ def gradient_descent(function,symbols,x0,learning_rate=0.1,iterations=100,mute=F
     i=0
     while i < iterations:
 
-        x.append(dict(zip(x0.keys(),x_star[i])))
+        # x.append(dict(zip(x0.keys(),x_star[i]))) ## Return x for visual!
 
         gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i])))
 
         x_star[i+1] = x_star[i].T - learning_rate*gradient.T
 
-        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-7 and i != 1:
-            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {dict(zip(x0.keys(),x_star[i+1]))}")
+        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-5:
+            solution = dict(zip(x0.keys(),x_star[i+1]))
+            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {solution}")
             break 
+        else:
+            solution = None
 
         if not mute:
             print(f"Step {i+1}: {x_star[i+1]}")
 
         i += 1
-        
-    return x
+    
+    return solution
 
     
 
@@ -40,7 +43,7 @@ def newton_method(function,symbols,x0,iterations=100,mute=False):
     x_star = {}
     x_star[0] = np.array(list(x0.values()))
     
-    x = []
+    # x = [] ## Return x for visual!
 
     if not mute:
         print(f"Starting Values: {x_star[0]}")
@@ -48,24 +51,26 @@ def newton_method(function,symbols,x0,iterations=100,mute=False):
     i=0
     while i < iterations:
 
-        x.append(dict(zip(x0.keys(),x_star[i])))
+        # x.append(dict(zip(x0.keys(),x_star[i]))) ## Return x for visual!
 
         gradient = get_gradient(function, symbols, dict(zip(x0.keys(),x_star[i])))
         hessian = get_hessian(function, symbols, dict(zip(x0.keys(),x_star[i])))
 
         x_star[i+1] = x_star[i].T - np.linalg.inv(hessian) @ gradient.T
 
-        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-7 and i != 1:
-            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {dict(zip(x0.keys(),x_star[i+1]))}")
+        if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-5:
+            solution = dict(zip(x0.keys(),x_star[i+1]))
+            print(f"\nConvergence Achieved ({i+1} iterations): Solution = {solution}")
             break
+        else:
+            solution = None
 
         if not mute:
             print(f"Step {i+1}: {x_star[i+1]}")
 
         i += 1
-
-    return x
-
+    
+    return solution
 
 
 def get_gradient(function, symbols, x0):
@@ -97,7 +102,7 @@ def get_hessian(function, symbols, x0):
 
 
 
-def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
+def constrained_newton_method(function,symbols,x0,iterations=100,mute=False):
 
     x_star = {}
     x_star[0] = np.array(list(x0.values())[:-1])
@@ -122,25 +127,28 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
         # Newton's Method
         i=0
         while i < iterations:
-            i += 1
         
-            gradient = get_gradient(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
-            hessian = get_hessian(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i-1])))
+            gradient = get_gradient(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i])))
+            hessian = get_hessian(function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1],x_star[i])))
 
-            x_star[i] = x_star[i-1].T - np.linalg.inv(hessian) @ gradient.T
+            x_star[i+1] = x_star[i].T - np.linalg.inv(hessian) @ gradient.T
 
-            if np.linalg.norm(x_star[i] - x_star[i-1]) < 10e-5 and i != 1:
-                print(f"Convergence Achieved ({i} iterations): Solution = {dict(zip(list(x0.keys())[:-1],x_star[i]))}\n") 
+            if np.linalg.norm(x_star[i+1] - x_star[i]) < 10e-5:
+                solution = dict(zip(list(x0.keys())[:-1],x_star[i+1]))
+                if not mute:
+                    print(f"Convergence Achieved ({i+1} iterations): Solution = {solution}\n") 
                 break
-        
-        # Record optimal solution for each barrier method iteration
-        optimal_solution = x_star[i]
+            
+            i += 1
+
+        # Record optimal solution & previous optimal solution for each barrier method iteration
+        optimal_solution = x_star[i+1]
+        previous_optimal_solution = list(optimal_solutions[step-1].values())
         optimal_solutions.append(dict(zip(list(x0.keys())[:-1],optimal_solution)))
         
         # Check for overall convergence
-        previous_optimal_solution = list(optimal_solutions[step-2].values())
-        if step != 1 and np.linalg.norm(optimal_solution - previous_optimal_solution) < 10e-5:
-            print(f"\n Overall Convergence Achieved ({step} steps): Solution = {dict(zip(list(x0.keys())[:-1],optimal_solution))}\n")
+        if np.linalg.norm(optimal_solution - previous_optimal_solution) < 10e-5:
+            print(f"\n Overall Convergence Achieved ({step} steps): Solution = {optimal_solutions[step]}\n")
             break
 
         # Set new starting point
@@ -153,7 +161,7 @@ def constrained_newton_method(function,symbols,x0,iterations=10000,mute=False):
         # Update Steps
         step += 1
 
-    return optimal_solutions
+    return optimal_solutions[step]
 
 
 
