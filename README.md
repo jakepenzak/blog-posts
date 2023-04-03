@@ -8,3 +8,4 @@ The code for the following articles is included:
 
 1. **Controlling for "X"?**
 1. **Predictive Parameters in a Logistic Regression: Making Sense of it All**
+1. **Optimization, Newton’s Method, & Profit Maximization:Part 1 - Part 3**
