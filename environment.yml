@@ -3,6 +3,8 @@ dependencies:
   - python
   - git
   - pip
+  - cudatoolkit
+  - numba 
   - pip:
     - ipykernel
     - jupyterlab
