@@ -9,11 +9,11 @@ def logit_margeff(model, X, features, kind='probability'):
     
     if kind == 'probability':
         
-        logodds = intercept+np.dot(X,coef.T)
+        logodds = intercept + X @ coef.T
     
         marg_effects=[]
         for i in range(coef.size):
-            marg_eff = np.mean(coef[0,i]*np.exp(-logodds)/(1+np.exp(-logodds))**2).round(3)
+            marg_eff = np.mean(coef[0,i]*np.exp(-logodds)/(1+np.exp(-logodds))**2).round(3)[0]
             marg_effects.append(marg_eff)
     
     elif kind == "odds":
