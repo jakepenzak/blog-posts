@@ -5,9 +5,13 @@ dependencies:
   - pip
   - cudatoolkit
   - numba 
+  - geckodriver
+  - selenium
+  - firefox
   - pip:
     - ipykernel
     - jupyterlab
+    - bokeh
     - shap==0.41.0
     - pandas==1.5.0
     - matplotlib==3.6.0
