@@ -3,18 +3,33 @@ import sympy as sm
 
 
 def gradient_descent(
-    function, symbols, x0, learning_rate=0.1, iterations=100, mute=False
-):
+    function: sm.core.expr.Expr,
+    symbols: list[sm.core.symbol.Symbol],
+    x0: dict[sm.core.symbol.Symbol, float],
+    learning_rate: float = 0.1,
+    iterations: int = 100,
+) -> dict[sm.core.symbol.Symbol, float] or None:
+    """
+    Performs gradient descent optimization to find the minimum of a given function.
+
+    Args:
+        function (sm.core.expr.Expr): The function to be optimized.
+        symbols (list[sm.core.symbol.Symbol]): The symbols used in the function.
+        x0 (dict[sm.core.symbol.Symbol, float]): The initial values for the symbols.
+        learning_rate (float, optional): The learning rate for the optimization. Defaults to 0.1.
+        iterations (int, optional): The maximum number of iterations. Defaults to 100.
+
+    Returns:
+        dict[sm.core.symbol.Symbol, float] or None: The solution found by the optimization, or None if no solution is found.
+    """
     x_star = {}
     x_star[0] = np.array(list(x0.values()))
 
     # x = [] ## Return x for visual!
 
-    if not mute:
-        print(f"Starting Values: {x_star[0]}")
+    print(f"Starting Values: {x_star[0]}")
 
-    i = 0
-    while i < iterations:
+    for i in range(iterations):
         # x.append(dict(zip(x0.keys(),x_star[i]))) ## Return x for visual!
 
         gradient = get_gradient(function, symbols, dict(zip(x0.keys(), x_star[i])))
@@ -28,25 +43,38 @@ def gradient_descent(
         else:
             solution = None
 
-        if not mute:
-            print(f"Step {i+1}: {x_star[i+1]}")
-
-        i += 1
+        print(f"Step {i+1}: {x_star[i+1]}")
 
     return solution
 
 
-def newton_method(function, symbols, x0, iterations=100, mute=False):
+def newton_method(
+    function: sm.core.expr.Expr,
+    symbols: list[sm.core.symbol.Symbol],
+    x0: dict[sm.core.symbol.Symbol, float],
+    iterations: int = 100,
+) -> dict[sm.core.symbol.Symbol, float] or None:
+    """
+    Perform Newton's method to find the solution to the optimization problem.
+
+    Args:
+        function (sm.core.expr.Expr): The objective function to be optimized.
+        symbols (list[sm.core.symbol.Symbol]): The symbols used in the objective function.
+        x0 (dict[sm.core.symbol.Symbol, float]): The initial values for the symbols.
+        iterations (int, optional): The maximum number of iterations. Defaults to 100.
+
+    Returns:
+        dict[sm.core.symbol.Symbol, float] or None: The solution to the optimization problem, or None if no solution is found.
+    """
+
     x_star = {}
     x_star[0] = np.array(list(x0.values()))
 
     # x = [] ## Return x for visual!
 
-    if not mute:
-        print(f"Starting Values: {x_star[0]}")
+    print(f"Starting Values: {x_star[0]}")
 
-    i = 0
-    while i < iterations:
+    for i in range(iterations):
         # x.append(dict(zip(x0.keys(),x_star[i]))) ## Return x for visual!
 
         gradient = get_gradient(function, symbols, dict(zip(x0.keys(), x_star[i])))
@@ -61,15 +89,27 @@ def newton_method(function, symbols, x0, iterations=100, mute=False):
         else:
             solution = None
 
-        if not mute:
-            print(f"Step {i+1}: {x_star[i+1]}")
-
-        i += 1
+        print(f"Step {i+1}: {x_star[i+1]}")
 
     return solution
 
 
-def get_gradient(function, symbols, x0):
+def get_gradient(
+    function: sm.core.expr.Expr,
+    symbols: list[sm.core.symbol.Symbol],
+    x0: dict[sm.core.symbol.Symbol, float],
+) -> np.ndarray:
+    """
+    Calculate the gradient of a function at a given point.
+
+    Args:
+        function (sm.core.expr.Expr): The function to calculate the gradient of.
+        symbols (list[sm.core.symbol.Symbol]): The symbols representing the variables in the function.
+        x0 (dict[sm.core.symbol.Symbol, float]): The point at which to calculate the gradient.
+
+    Returns:
+        numpy.ndarray: The gradient of the function at the given point.
+    """
     d1 = {}
     gradient = np.array([])
 
@@ -80,7 +120,22 @@ def get_gradient(function, symbols, x0):
     return gradient.astype(np.float64)
 
 
-def get_hessian(function, symbols, x0):
+def get_hessian(
+    function: sm.core.expr.Expr,
+    symbols: list[sm.core.symbol.Symbol],
+    x0: dict[sm.core.symbol.Symbol, float],
+) -> np.ndarray:
+    """
+    Calculate the Hessian matrix of a function at a given point.
+
+    Args:
+    function (sm.core.expr.Expr): The function for which the Hessian matrix is calculated.
+    symbols (list[sm.core.symbol.Symbol]): The list of symbols used in the function.
+    x0 (dict[sm.core.symbol.Symbol, float]): The point at which the Hessian matrix is evaluated.
+
+    Returns:
+    numpy.ndarray: The Hessian matrix of the function at the given point.
+    """
     d2 = {}
     hessian = np.array([])
 
@@ -94,29 +149,43 @@ def get_hessian(function, symbols, x0):
     return hessian.astype(np.float64)
 
 
-def constrained_newton_method(function, symbols, x0, iterations=100, mute=False):
+def constrained_newton_method(
+    function: sm.core.expr.Expr,
+    symbols: list[sm.core.symbol.Symbol],
+    x0: dict[sm.core.symbol.Symbol, float],
+    iterations: int = 100,
+) -> dict[sm.core.symbol.Symbol, float] or None:
+    """
+    Performs constrained Newton's method to find the optimal solution of a function subject to constraints.
+
+    Parameters:
+        function (sm.core.expr.Expr): The function to optimize.
+        symbols (list[sm.core.symbol.Symbol]): The symbols used in the function.
+        x0 (dict[sm.core.symbol.Symbol, float]): The initial values for the symbols.
+        iterations (int, optional): The maximum number of iterations. Defaults to 100.
+
+    Returns:
+        dict[sm.core.symbol.Symbol, float] or None: The optimal solution if convergence is achieved, otherwise None.
+    """
     x_star = {}
     x_star[0] = np.array(list(x0.values())[:-1])
 
     optimal_solutions = []
     optimal_solutions.append(dict(zip(list(x0.keys())[:-1], x_star[0])))
 
-    step = 1
-    while step < iterations:
+    for step in range(iterations):
         # Evaluate function at rho value
-        if step == 1:  # starting rho
+        if step == 0:  # starting rho
             rho_sub = list(x0.values())[-1]
 
         rho_sub_values = {list(x0.keys())[-1]: rho_sub}
         function_eval = function.evalf(subs=rho_sub_values)
 
-        if not mute:
-            print(f"Step {step} w/ {rho_sub_values}")  # Barrier method step
-            print(f"Starting Values: {x_star[0]}")
+        print(f"Step {step} w/ {rho_sub_values}")  # Barrier method step
+        print(f"Starting Values: {x_star[0]}")
 
         # Newton's Method
-        i = 0
-        while i < iterations:
+        for i in range(iterations):
             gradient = get_gradient(
                 function_eval, symbols[:-1], dict(zip(list(x0.keys())[:-1], x_star[i]))
             )
@@ -128,13 +197,10 @@ def constrained_newton_method(function, symbols, x0, iterations=100, mute=False)
 
             if np.linalg.norm(x_star[i + 1] - x_star[i]) < 10e-5:
                 solution = dict(zip(list(x0.keys())[:-1], x_star[i + 1]))
-                if not mute:
-                    print(
-                        f"Convergence Achieved ({i+1} iterations): Solution = {solution}\n"
-                    )
+                print(
+                    f"Convergence Achieved ({i+1} iterations): Solution = {solution}\n"
+                )
                 break
-
-            i += 1
 
         # Record optimal solution & previous optimal solution for each barrier method iteration
         optimal_solution = x_star[i + 1]
@@ -146,7 +212,10 @@ def constrained_newton_method(function, symbols, x0, iterations=100, mute=False)
             print(
                 f"\n Overall Convergence Achieved ({step} steps): Solution = {optimal_solutions[step]}\n"
             )
+            overall_solution = optimal_solutions[step]
             break
+        else:
+            overall_solution = None
 
         # Set new starting point
         x_star = {}
@@ -155,93 +224,4 @@ def constrained_newton_method(function, symbols, x0, iterations=100, mute=False)
         # Update rho
         rho_sub = 0.9 * rho_sub
 
-        # Update Steps
-        step += 1
-
-    return optimal_solutions[step]
-
-
-#####################
-#  Work In-Progress #
-#####################
-
-
-def quasi_newton_method(
-    function, symbols, x0, method="modified", iterations=10, mute=False
-):
-    x_star = {}
-    x_star[0] = np.array(list(x0.values()))
-
-    if not mute:
-        print(f"Starting Values: {x_star[0]}")
-
-    G = np.identity(len(symbols), dtype=np.float64)
-
-    i = 0
-    while i < iterations:
-        i += 1
-
-        gradient = get_gradient(function, symbols, x0)
-
-        if method == "modified":
-            G = get_hessian(function, symbols, x0)
-            u = -np.dot(np.linalg.inv(G), gradient.T)
-        else:
-            u = -np.dot(G, gradient.T)
-
-        L = get_lambda(function, x_star[i - 1], x0, u)
-
-        x_star[i] = x_star[i - 1].T + L * u
-
-        if i % 5 == 0 or i == 1:
-            print(f"Step {i}: {x_star[i]}")
-
-        if np.linalg.norm(x_star[i] - x_star[i - 1]) < 10e-10 and i != 1:
-            return print(f"Convergence Achieved: {x_star[i]}")
-
-        x0 = dict(zip(x0.keys(), x_star[i]))
-
-        # Update Hessian
-        v = L * u
-        y = get_gradient(function, symbols, x0).T - gradient.T
-
-        if method == "DFP":
-            G = rank1update(G, v, y)
-        elif method == "BFGS":
-            G = rank2update(G, v, y)
-        elif method == "modified":
-            pass
-        else:
-            raise ValueError("Choose between DFP & BFGS for methods.")
-
-    return
-
-
-def get_lambda(function, x_star, x0, u):
-    L = sm.symbols("L")
-
-    line_search = function.evalf(
-        subs={k: v for (k, v) in zip(x0.keys(), x_star.T + L * u)}
-    )
-
-    lambdaStar = newton_method(line_search, [L], {L: 0}, 20, mute=True)
-
-    return lambdaStar
-
-
-def rank1update(G, v, y):
-    A = np.dot(v, v.T) / np.dot(v.T, y)
-    B = -np.dot(np.dot(G, y), np.dot(G, y).T) / np.dot(np.dot(y.T, G), y)
-    G = G + A + B
-
-    return G
-
-
-def rank2update(G, v, y):
-    A = (1 + (np.dot(np.dot(y.T, G), y) / np.dot(v.T, y))) * (
-        np.dot(v, v.T) / np.dot(v.T, y)
-    )
-    B = -(np.dot(np.dot(v, y.T), G) + np.dot(np.dot(G, y), v.T)) / np.dot(v.T, y)
-    G = G + A + B
-
-    return G
+    return overall_solution

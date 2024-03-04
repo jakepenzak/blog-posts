@@ -4,9 +4,17 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def grid_search(diff_i, i, perplexity):
+def grid_search(diff_i: np.ndarray, i: int, perplexity: int) -> float:
     """
     Helper function to obtain σ's based on user-specified perplexity.
+
+    Parameters:
+        diff_i (np.ndarray): Array containing the pairwise differences between data points.
+        i (int): Index of the current data point.
+        perplexity (int): User-specified perplexity value.
+
+    Returns:
+        float: The value of σ that satisfies the perplexity condition.
     """
 
     result = np.inf  # Set first result to be infinity
@@ -36,9 +44,16 @@ def grid_search(diff_i, i, perplexity):
     return σ
 
 
-def get_original_pairwise_affinities(X: np.array([]), perplexity=10):
+def get_original_pairwise_affinities(X: np.ndarray, perplexity: int = 10) -> np.ndarray:
     """
     Function to obtain affinities matrix.
+
+    Parameters:
+    X (np.ndarray): The input data array.
+    perplexity (int): The perplexity value for the grid search.
+
+    Returns:
+    np.ndarray: The pairwise affinities matrix.
     """
 
     n = len(X)
@@ -68,11 +83,17 @@ def get_original_pairwise_affinities(X: np.array([]), perplexity=10):
     return p_ij
 
 
-def get_symmetric_p_ij(p_ij: np.array([])):
+def get_symmetric_p_ij(p_ij: np.ndarray) -> np.ndarray:
     """
     Function to obtain symmetric affinities matrix utilized in t-SNE.
-    """
 
+    Parameters:
+    p_ij (np.ndarray): The input affinity matrix.
+
+    Returns:
+    np.ndarray: The symmetric affinities matrix.
+
+    """
     print("Computing Symmetric p_ij matrix....")
 
     n = len(p_ij)
@@ -90,9 +111,22 @@ def get_symmetric_p_ij(p_ij: np.array([])):
     return p_ij_symmetric
 
 
-def initialization(X: np.array([]), n_dimensions=2, initialization="random"):
+def initialization(
+    X: np.ndarray, n_dimensions: int = 2, initialization: str = "random"
+) -> np.ndarray:
     """
     Obtain initial solution for t-SNE either randomly or using PCA.
+
+    Parameters:
+        X (np.ndarray): The input data array.
+        n_dimensions (int): The number of dimensions for the output solution. Default is 2.
+        initialization (str): The initialization method. Can be 'random' or 'PCA'. Default is 'random'.
+
+    Returns:
+        np.ndarray: The initial solution for t-SNE.
+
+    Raises:
+        ValueError: If the initialization method is neither 'random' nor 'PCA'.
     """
 
     # Sample Initial Solution
@@ -102,13 +136,21 @@ def initialization(X: np.array([]), n_dimensions=2, initialization="random"):
         X_centered = X - X.mean(axis=0)
         _, _, Vt = np.linalg.svd(X_centered)
         y0 = X_centered @ Vt.T[:, :n_dimensions]
+    else:
+        raise ValueError("Initialization must be 'random' or 'PCA'")
 
     return y0
 
 
-def get_low_dimensional_affinities(Y: np.array([])):
+def get_low_dimensional_affinities(Y: np.ndarray) -> np.ndarray:
     """
     Obtain low-dimensional affinities.
+
+    Parameters:
+    Y (np.ndarray): The low-dimensional representation of the data points.
+
+    Returns:
+    np.ndarray: The low-dimensional affinities matrix.
     """
 
     n = len(Y)
@@ -133,9 +175,17 @@ def get_low_dimensional_affinities(Y: np.array([])):
     return q_ij
 
 
-def get_gradient(p_ij: np.array([]), q_ij: np.array([]), Y: np.array([])):
+def get_gradient(p_ij: np.ndarray, q_ij: np.ndarray, Y: np.ndarray) -> np.ndarray:
     """
     Obtain gradient of cost function at current point Y.
+
+    Parameters:
+    p_ij (np.ndarray): The joint probability distribution matrix.
+    q_ij (np.ndarray): The Student's t-distribution matrix.
+    Y (np.ndarray): The current point in the low-dimensional space.
+
+    Returns:
+    np.ndarray: The gradient of the cost function at the current point Y.
     """
 
     n = len(p_ij)
@@ -154,13 +204,27 @@ def get_gradient(p_ij: np.array([]), q_ij: np.array([]), Y: np.array([])):
 
 
 def low_dimensional_embedding(
-    p_ij: np.array([]),
-    Y0: np.array([]),
-    T=1000,
-    η=200,
-    early_exaggeration=4,
-    n_dimensions=2,
-):
+    p_ij: np.ndarray,
+    Y0: np.ndarray,
+    T: int = 1000,
+    η: int = 200,
+    early_exaggeration: int = 4,
+    n_dimensions: int = 2,
+) -> list[np.ndarray, np.ndarray]:
+    """
+    Perform low-dimensional embedding using t-SNE algorithm.
+
+    Args:
+        p_ij (np.ndarray): The high-dimensional affinities matrix.
+        Y0 (np.ndarray): The initial low-dimensional embedding.
+        T (int, optional): The number of iterations. Defaults to 1000.
+        η (int, optional): The learning rate. Defaults to 200.
+        early_exaggeration (int, optional): The early exaggeration factor. Defaults to 4.
+        n_dimensions (int, optional): The number of dimensions in the low-dimensional embedding. Defaults to 2.
+
+    Returns:
+        list[np.ndarray, np.ndarray]: A list containing the final low-dimensional embedding and the history of embeddings during optimization.
+    """
     print("Optimizing Low Dimensional Embedding....")
 
     n = len(p_ij)
@@ -205,8 +269,30 @@ def low_dimensional_embedding(
 
 
 def tsne(
-    X: np.array([]), perplexity=10, T=1000, η=200, early_exaggeration=4, n_dimensions=2
-):
+    X: np.ndarray,
+    perplexity: int = 10,
+    T: int = 1000,
+    η: int = 200,
+    early_exaggeration: int = 4,
+    n_dimensions: int = 2,
+) -> list[np.ndarray, np.ndarray]:
+    """
+    t-SNE (t-Distributed Stochastic Neighbor Embedding) algorithm implementation.
+
+    Args:
+        X (np.ndarray): The input data matrix of shape (n_samples, n_features).
+        perplexity (int, optional): The perplexity parameter. Default is 10.
+        T (int, optional): The number of iterations for optimization. Default is 1000.
+        η (int, optional): The learning rate for updating the low-dimensional embeddings. Default is 200.
+        early_exaggeration (int, optional): The factor by which the pairwise affinities are exaggerated
+            during the early iterations of optimization. Default is 4.
+        n_dimensions (int, optional): The number of dimensions of the low-dimensional embeddings. Default is 2.
+
+    Returns:
+        list[np.ndarray, np.ndarray]: A list containing the final low-dimensional embeddings and the history
+            of embeddings at each iteration.
+
+    """
     n = len(X)
 
     # Get original affinities matrix
