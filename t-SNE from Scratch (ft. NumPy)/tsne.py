@@ -196,7 +196,7 @@ def get_gradient(p_ij: np.ndarray, q_ij: np.ndarray, Y: np.ndarray) -> np.ndarra
         # Equation 5
         diff = Y[i] - Y
         A = np.array([(p_ij[i, :] - q_ij[i, :])])
-        B = np.array([(1 + np.linalg.norm(diff, axis=1)) ** (-1)])
+        B = np.array([(1 + np.linalg.norm(diff, axis=1) ** 2) ** (-1)])
         C = diff
         gradient[i] = 4 * np.sum((A * B).T * C, axis=0)
 
