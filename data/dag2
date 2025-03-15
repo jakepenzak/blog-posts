@@ -1,0 +1,14 @@
+digraph {
+	graph [dpi=400]
+	Age
+	"# Social Media Accounts"
+	"Yrs Member"
+	"Advertisement Exposure"
+	Sales
+	Z
+	Age -> Sales
+	"# Social Media Accounts" -> Sales
+	"Yrs Member" -> Sales
+	Z -> Sales
+	"Advertisement Exposure" -> Sales [color=red]
+}

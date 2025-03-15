@@ -1,0 +1,17 @@
+digraph {
+	graph [dpi=400]
+	Age
+	"# Social Media Accounts"
+	"Yrs Member"
+	"Time on Website"
+	Sales
+	Z
+	Age -> "Time on Website"
+	"# Social Media Accounts" -> "Time on Website"
+	"Yrs Member" -> "Time on Website"
+	Age -> Sales
+	"# Social Media Accounts" -> Sales
+	"Yrs Member" -> Sales
+	"Time on Website" -> Sales [color=red]
+	Z -> Sales
+}
