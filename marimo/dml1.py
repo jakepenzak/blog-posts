@@ -218,13 +218,12 @@ def _(graphviz, mo):
         g.edge("Time on Website", "Sales", color="red")
         g.edge("Z", "Sales")
 
-        g.graph_attr["dpi"] = "400"
+        g.graph_attr["dpi"] = "200"
 
-        # Render for print
-        g.render("data/dag1")
+        g.render("data/dag1", format="webp")
 
     create_dag1()
-    mo.image("data/dag1.png")
+    mo.image("data/dag1.webp").center()
     return (create_dag1,)
 
 
@@ -523,9 +522,10 @@ def _(graphviz, mo):
         g.edge("Advertisement Exposure", "Sales", color="red")
         g.graph_attr["dpi"] = "400"
 
-        g.render("data/dag2")
+        g.render("data/dag2", format="webp")
 
-    mo.image("data/dag2.png")
+    create_dag2()
+    mo.image("data/dag2.webp").center()
     return (create_dag2,)
 
 

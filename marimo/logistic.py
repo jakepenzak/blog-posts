@@ -77,7 +77,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def lin_prob_vs_logistic_viz():
         x = np.arange(-0.25, 1.25, 0.001)
         z = 1 / (1 + np.exp(-((x - 0.5) / 0.1)))
@@ -102,9 +102,10 @@ def _(np, plt):
         fig.gca().spines["left"].set_visible(False)
         ax.axhspan(0, -0.25, alpha=0.2, color="black")
         ax.axhspan(1, 1.25, alpha=0.2, color="black")
-        plt.show()
+        plt.savefig("data/lin_prob_vs_logistic_viz.webp", format="webp", dpi=200)
 
     lin_prob_vs_logistic_viz()
+    mo.image("data/lin_prob_vs_logistic_viz.webp").center()
     return (lin_prob_vs_logistic_viz,)
 
 

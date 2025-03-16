@@ -32,7 +32,9 @@ def _():
 
     COLORS = ["#00B0F0", "#FF0000", "#B0F000"]
 
-    def plot_effect(effect_true, effect_pred, figsize=(8, 5), ylim=(-10, 100)):
+    def plot_effect(
+        effect_true, effect_pred, save_path, figsize=(8, 5), ylim=(-10, 100)
+    ):
         plt.figure(figsize=figsize)
         plt.scatter(effect_true, effect_pred, color=COLORS[0], s=10)
         plt.plot(
@@ -45,9 +47,9 @@ def _():
         plt.xlabel("True effect", fontsize=14)
         plt.ylabel("Predicted effect", fontsize=14)
         plt.legend()
-        plt.show()
+        plt.savefig(save_path, format="webp", dpi=200)
 
-    def hist_effect(effect_true, effect_pred, figsize=(8, 5)):
+    def hist_effect(effect_true, effect_pred, save_path, figsize=(8, 5)):
         plt.figure(figsize=figsize)
 
         plt.hist(
@@ -68,7 +70,7 @@ def _():
         )
 
         plt.legend()
-        plt.show()
+        plt.savefig(save_path, format="webp", dpi=200)
 
     return (
         COLORS,
@@ -210,9 +212,10 @@ def _(graphviz, mo):
         g.graph_attr["dpi"] = "400"
 
         # Render for print
-        g.render("data/dag1")
+        g.render("data/dag1", format="webp")
 
-    mo.image("data/dag1.png")
+    create_dag()
+    mo.image("data/dag1.webp").center()
     return (create_dag,)
 
 
@@ -413,8 +416,10 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(hist_effect, linear_dml_cates, true_cates):
-    hist_effect(true_cates, linear_dml_cates)
+def _(hist_effect, linear_dml_cates, mo, true_cates):
+    hist_effect(true_cates, linear_dml_cates, save_path="data/linear_dml_hist.webp")
+
+    mo.image("data/linear_dml_hist.webp", height=500).center()
     return
 
 
@@ -427,8 +432,10 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(linear_dml_cates, plot_effect, true_cates):
-    plot_effect(true_cates, linear_dml_cates)
+def _(linear_dml_cates, mo, plot_effect, true_cates):
+    plot_effect(true_cates, linear_dml_cates, save_path="data/linear_dml_line.webp")
+
+    mo.image("data/linear_dml_line.webp", height=500).center()
     return
 
 
@@ -594,14 +601,26 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(hist_effect, linear_dml_cates_nonlinear, true_cates_nonlinear):
-    hist_effect(true_cates_nonlinear, linear_dml_cates_nonlinear)
+def _(hist_effect, linear_dml_cates_nonlinear, mo, true_cates_nonlinear):
+    hist_effect(
+        true_cates_nonlinear,
+        linear_dml_cates_nonlinear,
+        save_path="data/linear_dml_nonlinear_hist.webp",
+    )
+
+    mo.image("data/linear_dml_nonlinear_hist.webp", height=500).center()
     return
 
 
 @app.cell(hide_code=True)
-def _(linear_dml_cates_nonlinear, plot_effect, true_cates_nonlinear):
-    plot_effect(true_cates_nonlinear, linear_dml_cates_nonlinear)
+def _(linear_dml_cates_nonlinear, mo, plot_effect, true_cates_nonlinear):
+    plot_effect(
+        true_cates_nonlinear,
+        linear_dml_cates_nonlinear,
+        save_path="data/linear_dml_nonlinear_line.webp",
+    )
+
+    mo.image("data/linear_dml_nonlinear_line.webp", height=500).center()
     return
 
 
@@ -709,14 +728,26 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(hist_effect, nonparam_dml_cates_nonlinear, true_cates_nonlinear):
-    hist_effect(true_cates_nonlinear, nonparam_dml_cates_nonlinear)
+def _(hist_effect, mo, nonparam_dml_cates_nonlinear, true_cates_nonlinear):
+    hist_effect(
+        true_cates_nonlinear,
+        nonparam_dml_cates_nonlinear,
+        save_path="data/nonparam_dml_nonlinear_hist.webp",
+    )
+
+    mo.image("data/nonparam_dml_nonlinear_hist.webp", height=500).center()
     return
 
 
 @app.cell(hide_code=True)
-def _(nonparam_dml_cates_nonlinear, plot_effect, true_cates_nonlinear):
-    plot_effect(true_cates_nonlinear, nonparam_dml_cates_nonlinear)
+def _(mo, nonparam_dml_cates_nonlinear, plot_effect, true_cates_nonlinear):
+    plot_effect(
+        true_cates_nonlinear,
+        nonparam_dml_cates_nonlinear,
+        save_path="data/nonparam_dml_nonlinear_line.webp",
+    )
+
+    mo.image("data/nonparam_dml_nonlinear_line.webp", height=500).center()
     return
 
 

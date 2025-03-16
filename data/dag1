@@ -1,5 +1,5 @@
 digraph {
-	graph [dpi=400]
+	graph [dpi=200]
 	Age
 	"# Social Media Accounts"
 	"Yrs Member"

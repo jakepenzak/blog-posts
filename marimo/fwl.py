@@ -30,12 +30,6 @@ def _():
 
 
 @app.cell
-def _(os):
-    os.getcwd()
-    return
-
-
-@app.cell
 def _(mo):
     mo.md(
         """
@@ -255,9 +249,9 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(df, plt, sns):
+def _(df, mo, plt, sns):
     def data_hists():
-        fig, ax = plt.subplots(3, 2, figsize=(15, 15))
+        fig, ax = plt.subplots(3, 2, figsize=(15, 15), dpi=300)
         sns.histplot(
             df.HHinc, color="b", ax=ax[0, 0], bins=15, stat="proportion", kde=True
         )
@@ -274,9 +268,10 @@ def _(df, plt, sns):
             df.educ, color="g", ax=ax[2, 0], bins=30, stat="proportion", kde=True
         )
         sns.regplot(data=df, x="read", y="educ", color="y", truncate=False, ax=ax[2, 1])
-        plt.show()
+        plt.savefig("data/data_hists.webp", format="webp", dpi=200)
 
     data_hists()
+    mo.image("data/data_hists.webp").center()
     return (data_hists,)
 
 
@@ -358,18 +353,21 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(df, plt, sns):
+def _(df, mo, plt, sns):
     def fwl_residual_plot():
-        fig2, ax2 = plt.subplots(1, 2, figsize=(15, 5))  # ,dpi=1000)
-        ax2[0].set_title("Naive Regression", fontsize=17)
-        ax2[1].set_title("FWL Regression", fontsize=17)
-        sns.regplot(data=df, x="read", y="educ", color="y", truncate=False, ax=ax2[0])
+        fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+        ax[0].set_title("Naive Regression", fontsize=17)
+        ax[1].set_title("FWL Regression", fontsize=17)
+        sns.regplot(data=df, x="read", y="educ", color="y", truncate=False, ax=ax[0])
         sns.regplot(
-            data=df, x="read_star", y="educ_star", color="y", truncate=False, ax=ax2[1]
+            data=df, x="read_star", y="educ_star", color="y", truncate=False, ax=ax[1]
         )
-        plt.show()
+        ax[1].set_xlabel("$read^*$")
+        ax[1].set_ylabel("$educ^*$")
+        plt.savefig("data/fwl_residual_plot.webp", format="webp", dpi=200)
 
     fwl_residual_plot()
+    mo.image("data/fwl_residual_plot.webp").center()
     return (fwl_residual_plot,)
 
 

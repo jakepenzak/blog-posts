@@ -26,7 +26,7 @@ def _():
 def _(mo):
     mo.md(
         r"""
-        # Optimization, Netwon's Method, & Profit Maximization: Part 2 - Constrained Optimization Theory
+        # Optimization, Newton's Method, & Profit Maximization: Part 2 - Constrained Optimization Theory
         <center> **Learn how to solve constrained optimization problems** </center>
         """
     )
@@ -274,7 +274,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(animation, mo, np, plt):
-    def eqc_resonbrocks_viz_3d():
+    def eqc_rosenbrocks_viz_3d():
         x = np.outer(np.linspace(-10, 10, 50), np.ones(50))
         y = x.copy().T
         z = 100 * (y - x**2) ** 2 + (1 - x) ** 2
@@ -312,16 +312,16 @@ def _(animation, mo, np, plt):
             fig, rotate, frames=np.arange(0, 362, 2), interval=100
         )
 
-        rot_animation.save("data/eqc_rosenbrocks_viz_3d.gif", dpi=125)
+        rot_animation.save("data/eqc_rosenbrocks_viz_3d.gif", dpi=200)
 
-    eqc_resonbrocks_viz_3d()
-    mo.image("data/eqc_rosenbrocks_viz_3d.gif")
-    return (eqc_resonbrocks_viz_3d,)
+    eqc_rosenbrocks_viz_3d()
+    mo.image("data/eqc_rosenbrocks_viz_3d.gif", height=500).center()
+    return (eqc_rosenbrocks_viz_3d,)
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
-    def eqc_resonbrocks_viz_contour():
+def _(mo, np, plt):
+    def eqc_rosenbrocks_viz_contour():
         # Define the Rosenbrock function
         def rosenbrock(x, y):
             return 100 * (y - x**2) ** 2 + (1 - x) ** 2
@@ -389,10 +389,11 @@ def _(np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.show()
+        plt.savefig("data/eqc_rosenbrocks_viz_contour.webp", format="webp", dpi=200)
 
-    eqc_resonbrocks_viz_contour()
-    return (eqc_resonbrocks_viz_contour,)
+    eqc_rosenbrocks_viz_contour()
+    mo.image("data/eqc_rosenbrocks_viz_contour.webp", height=500).center()
+    return (eqc_rosenbrocks_viz_contour,)
 
 
 @app.cell
@@ -498,7 +499,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(Poly3DCollection, animation, mo, np, plt):
-    def ineqc_resonbrocks_viz_3d():
+    def ineqc_rosenbrocks_viz_3d():
         # Define Rosenbrock function
         x = np.outer(np.linspace(-10, 10, 50), np.ones(50))
         y = x.copy().T
@@ -528,11 +529,11 @@ def _(Poly3DCollection, animation, mo, np, plt):
         ax.set_zlabel("z")
 
         # Plot infeasible region boundaries with transparency
-        ax.plot_surface(XC1, YC1, ZC1, color="black", alpha=0.8, zorder=3)
-        ax.plot_surface(XC2, YC2, ZC2, color="black", alpha=0.8, zorder=3)
+        ax.plot_surface(XC1, YC1, ZC1, color="black", alpha=0.6)
+        ax.plot_surface(XC2, YC2, ZC2, color="black", alpha=0.6)
 
         # Plot Rosenbrock function surface
-        ax.plot_surface(x, y, z, cmap="plasma", alpha=0.8, zorder=2)
+        ax.plot_surface(x, y, z, cmap="plasma", alpha=0.8)
 
         # Highlight feasible region
         # Feasible region vertices (clockwise order)
@@ -588,7 +589,7 @@ def _(Poly3DCollection, animation, mo, np, plt):
         ]
 
         # Add feasible region as a green shaded box
-        feasible_poly = Poly3DCollection(faces, color="lightgreen", alpha=0.3)
+        feasible_poly = Poly3DCollection(faces, color="lightgreen", alpha=0.4)
         ax.add_collection3d(feasible_poly)
 
         # Rotating Visualization
@@ -599,17 +600,16 @@ def _(Poly3DCollection, animation, mo, np, plt):
             fig, rotate, frames=np.arange(0, 362, 2), interval=100
         )
 
-        # Save the animation
-        rot_animation.save("data/ineqc_rosenbrock_viz_3d.gif", dpi=125)
+        rot_animation.save("data/ineqc_rosenbrocks_viz_3d.gif", dpi=200)
 
-    ineqc_resonbrocks_viz_3d()
-    mo.image("data/ineqc_resonbrocks_viz_3d.gif")
-    return (ineqc_resonbrocks_viz_3d,)
+    ineqc_rosenbrocks_viz_3d()
+    mo.image("data/ineqc_rosenbrocks_viz_3d.gif", height=500).center()
+    return (ineqc_rosenbrocks_viz_3d,)
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
-    def ineqc_resonbrocks_viz_contour():
+def _(mo, np, plt):
+    def ineqc_rosenbrocks_viz_contour():
         # Define the Rosenbrock function
         def rosenbrock(x, y):
             return 100 * (y - x**2) ** 2 + (1 - x) ** 2
@@ -682,10 +682,11 @@ def _(np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.show()
+        plt.savefig("data/ineqc_rosenbrocks_viz_contour.webp", format="webp", dpi=200)
 
-    ineqc_resonbrocks_viz_contour()
-    return (ineqc_resonbrocks_viz_contour,)
+    ineqc_rosenbrocks_viz_contour()
+    mo.image("data/ineqc_rosenbrocks_viz_contour.webp", height=500).center()
+    return (ineqc_rosenbrocks_viz_contour,)
 
 
 @app.cell
@@ -720,7 +721,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def logarithmic_barrier_function():
         # Defining surface and axes
         x = np.linspace(0.01, 20, 1000)
@@ -745,10 +746,10 @@ def _(np, plt):
         plt.plot(x, y, "r")
         plt.plot(x, y2, "g")
 
-        # show the plot
-        plt.show()
+        plt.savefig("data/logarithmic_barrier_function.webp", format="webp", dpi=200)
 
     logarithmic_barrier_function()
+    mo.image("data/logarithmic_barrier_function.webp", height=500).center()
     return (logarithmic_barrier_function,)
 
 

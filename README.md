@@ -14,7 +14,7 @@ The code for the following articles is included:
 
 ## Environment
 
-These articles were developed using [Marimo](https://marimo.io/). We also provide jupyter notebooks for those who prefer that, available in the `jupyter` directory, but Marimo is recommended.
+These articles were developed using [Marimo](https://marimo.io/). We also provide jupyter notebooks for those who prefer that, available in the `jupyter` directory, but Marimo is recommended as jupyter notebooks may contain bugs, since we convert them from Marimo.
 
 1. Clone repo to local machine 
 1. Install [uv](https://docs.astral.sh/uv/)

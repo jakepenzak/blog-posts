@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.8"
+__generated_with = "0.11.20"
 app = marimo.App(width="medium")
 
 
@@ -44,7 +44,7 @@ def _():
 def _(mo):
     mo.md(
         r"""
-        # Optimization, Netwon's Method, & Profit Maximization: Part 3 - Applied Profit Maximization
+        # Optimization, Newton's Method, & Profit Maximization: Part 3 - Applied Profit Maximization
         <center> **Learn how to apply optimization & econometric techniques to solve an applied profit maximization problem** </center>
         """
     )
@@ -422,7 +422,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def saturation_plot():
         fig, ax = plt.subplots(dpi=125)
 
@@ -444,9 +444,10 @@ def _(np, plt):
         plt.xlabel("Digital Advertising", size="large")
         plt.ylabel("Quantity Demanded", size="large")
 
-        plt.show()
+        plt.savefig("data/saturation_plot.webp", format="webp", dpi=200)
 
     saturation_plot()
+    mo.image("data/saturation_plot.webp", height=500).center()
     return (saturation_plot,)
 
 
@@ -721,7 +722,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(T, mtick, np, plt, quantity_demanded_ar):
+def _(T, mo, mtick, np, plt, quantity_demanded_ar):
     def quantity_demanded_plot():
         fig, ax = plt.subplots(dpi=125)
 
@@ -748,9 +749,10 @@ def _(T, mtick, np, plt, quantity_demanded_ar):
         plt.xlabel("Years", size="large")
         plt.ylabel("Quantity Demanded", size="large")
 
-        plt.show()
+        plt.savefig("data/quantity_demanded_plot.webp", format="webp", dpi=200)
 
     quantity_demanded_plot()
+    mo.image("data/quantity_demanded_plot.webp", height=500).center()
     return (quantity_demanded_plot,)
 
 
@@ -993,15 +995,15 @@ def _(FuncFormatter, animation, mo, np, plt):
             fig, rotate, frames=np.arange(0, 362, 2), interval=100
         )
 
-        rot_animation.save("data/profit_function_viz_3d.gif", dpi=125)
+        rot_animation.save("data/profit_function_viz_3d.gif", dpi=200)
 
     profit_function_viz_3d()
-    mo.image("data/profit_function_viz_3d.gif")
+    mo.image("data/profit_function_viz_3d.gif", height=500).center()
     return (profit_function_viz_3d,)
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def profit_function_viz_contour():
         def log(x):
             return np.log(x)
@@ -1091,16 +1093,17 @@ def _(np, plt):
         plt.ylabel(r"$\tau$")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.show()
+        plt.savefig("data/profit_function_viz_contour.webp", format="webp", dpi=200)
 
     profit_function_viz_contour()
+    mo.image("data/profit_function_viz_contour.webp", height=500).center()
     return (profit_function_viz_contour,)
 
 
 @app.cell
 def _(mo):
     mo.md(
-        r"""Let’s now solve our optimization problem as formulated in eq. 12 via python using the optimization theory that we have learned from part 1 and part 2 of this series. _Note that the extremely high value of $/rho$ is to account for the fact that the values of our objective function are extremely large thus we need to make sure penalization is large enough to avoid “jumping” out of constraints - we could normalize values for more stability._"""
+        r"""Let’s now solve our optimization problem as formulated in eq. 12 via python using the optimization theory that we have learned from part 1 and part 2 of this series. _Note that the extremely high value of $\rho$ is to account for the fact that the values of our objective function are extremely large thus we need to make sure penalization is large enough to avoid “jumping” out of constraints - we could normalize values for more stability._"""
     )
     return
 

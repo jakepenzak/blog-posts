@@ -92,13 +92,13 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def parabola_viz():
         x = np.linspace(-5.5, 5, 100)
         y = 3 * x**2 + 2 * x - 24
 
         # setting the axes at the centre
-        fig = plt.figure(dpi=125)
+        fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         # ax.spines['left'].set_position('zero')
         ax.spines["bottom"].set_position("zero")
@@ -115,10 +115,10 @@ def _(np, plt):
         plt.scatter(-1 / 3, 3 * (-1 / 3) ** 2 + 2 * (-1 / 3) - 24, c="black")
         plt.plot(x, y, "r")
 
-        # show the plot
-        plt.show()
+        plt.savefig("data/parabola_viz.webp", format="webp", dpi=200)
 
     parabola_viz()
+    mo.image("data/parabola_viz.webp", height=500).center()
     return (parabola_viz,)
 
 
@@ -126,7 +126,7 @@ def _(np, plt):
 def _(mo):
     mo.md(
         r"""
-        Note that when multiple extrema of a function exist (i.e., multiple minimums or maximums), care must be taken to determine which is the global extrema — we will briefly discuss this issue further in this article.
+        7Note that when multiple extrema of a function exist (i.e., multiple minimums or maximums), care must be taken to determine which is the global extrema — we will briefly discuss this issue further in this article.
 
         The analytical approach demonstrated above can be extended into higher dimensions utilizing gradients and Hessians — however, we will not be solving the closed-form solutions in higher dimensions — the intuition, however, remains the same. We will, nevertheless, be solving higher dimensional problems utilizing _iterative schemes_. What do I mean by _iterative schemes_? In general, a closed form (or analytical) solution may not exist, and certainly need not exist for a maximum or minimum to exist. Thus, we require a methodology to numerically solve the optimization problem. This leads us to the more generalized iterative schemes including gradient descent and the Newton methods.
 
@@ -243,10 +243,10 @@ def _(animation, gradient_descent, mo, np, plt, sm):
             fig, animate, frames=len(x_iterations), interval=500
         )
 
-        rot_animation.save("data/gradient_descent.gif", dpi=125)
+        rot_animation.save("data/gradient_descent.gif", dpi=200)
 
     gd_visual()
-    mo.image("data/gradient_descent.gif")
+    mo.image("data/gradient_descent.gif", height=500).center()
     return (gd_visual,)
 
 
@@ -359,15 +359,15 @@ def _(animation, mo, np, plt):
             fig, rotate, frames=np.arange(0, 362, 2), interval=100
         )
 
-        rot_animation.save("data/rosenbrocks_viz_3d.gif", dpi=125)
+        rot_animation.save("data/rosenbrocks_viz_3d.gif", dpi=200)
 
     rosenbrocks_viz_3d()
-    mo.image("data/rosenbrocks_viz_3d.gif")
+    mo.image("data/rosenbrocks_viz_3d.gif", height=500).center()
     return (rosenbrocks_viz_3d,)
 
 
 @app.cell(hide_code=True)
-def _(np, plt):
+def _(mo, np, plt):
     def rosenbrocks_viz_contour():
         # Define the Rosenbrock function
         def rosenbrock(x, y):
@@ -406,9 +406,10 @@ def _(np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.25))
-        plt.show()
+        plt.savefig("data/rosenbrocks_viz_contour.webp", format="webp", dpi=200)
 
     rosenbrocks_viz_contour()
+    mo.image("data/rosenbrocks_viz_contour.webp", height=500).center()
     return (rosenbrocks_viz_contour,)
 
 
@@ -896,11 +897,6 @@ def _(mo):
         </center>
         """
     )
-    return
-
-
-@app.cell
-def _():
     return
 
 

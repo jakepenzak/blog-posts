@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.8"
+__generated_with = "0.11.20"
 app = marimo.App(width="medium")
 
 
@@ -24,6 +24,7 @@ def _():
     except:
         pass
 
+    np.seterr(divide="ignore", invalid="ignore")
     warnings.simplefilter("ignore", RuntimeWarning)
     warnings.filterwarnings("ignore")
     return (
@@ -100,20 +101,9 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(HTML, base64):
-    # Load image
-    img_path = "data/algorithm.webp"
-
-    # Convert image to base64 string
-    with open(img_path, "rb") as img_file:
-        img_base64 = base64.b64encode(img_file.read()).decode()
-
-    # Create HTML with centered image
-    html_code = f"""<center> <img src="data:image/webp;base64,{img_base64}" style="max-width: 100%; height: auto;"> </center>"""
-
-    # Display in Jupyter Notebook
-    HTML(html_code)
-    return html_code, img_base64, img_file, img_path
+def _(mo):
+    mo.image("data/algorithm.webp").center()
+    return
 
 
 @app.cell
@@ -881,7 +871,7 @@ def _(Y, animation, mo, np, plt, y_reduced):
         rot_animation.save("data/MNIST.gif", dpi=200)
 
     tsne_evolution_fig()
-    mo.image("data/MNIST.gif")
+    mo.image("data/MNIST.gif", height=500).center()
     return (tsne_evolution_fig,)
 
 
