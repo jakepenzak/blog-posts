@@ -137,9 +137,7 @@ def _(PCA, fetch_openml, np, pd):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""This will be our X dataset with each row being an image and each column being a feature, or principal component in this case (i.e. linear combinations of the original pixels):"""
-    )
+    mo.md(r"""This will be our X dataset with each row being an image and each column being a feature, or principal component in this case (i.e. linear combinations of the original pixels):""")
     return
 
 
@@ -223,7 +221,6 @@ def _(grid_search, np):
         print("Completed Pairwise Affinities Matrix. \n")
 
         return p_ij
-
     return (get_original_pairwise_affinities,)
 
 
@@ -303,7 +300,6 @@ def _(np):
                 σ = σ_search
 
         return σ
-
     return (grid_search,)
 
 
@@ -377,15 +373,12 @@ def _(np):
         print("Completed Symmetric p_ij Matrix. \n")
 
         return p_ij_symmetric
-
     return (get_symmetric_p_ij,)
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Feeding in `p_ij` from above, we obtain the following symmetric affinities matrix:"""
-    )
+    mo.md(r"""Feeding in `p_ij` from above, we obtain the following symmetric affinities matrix:""")
     return
 
 
@@ -457,7 +450,6 @@ def _(np):
             raise ValueError("Initialization must be 'random' or 'PCA'")
 
         return y0
-
     return (initialization,)
 
 
@@ -531,15 +523,12 @@ def _(np):
         q_ij = np.maximum(q_ij, ε)
 
         return q_ij
-
     return (get_low_dimensional_affinities,)
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Here we are seeking a 1000 x 1000 affinity matrix but now in the lower dimensional space:"""
-    )
+    mo.md(r"""Here we are seeking a 1000 x 1000 affinity matrix but now in the lower dimensional space:""")
     return
 
 
@@ -622,7 +611,6 @@ def _(np):
             gradient[i] = 4 * np.sum((A * B).T * C, axis=0)
 
         return gradient
-
     return (get_gradient,)
 
 
@@ -762,13 +750,12 @@ def _(
         solution = Y[-1]
 
         return solution, Y
-
     return (tsne,)
 
 
 @app.cell
 def _(mo):
-    mo.md(r"""Now we calling the code:""")
+    mo.md(r"""Now calling the code:""")
     return
 
 
@@ -789,9 +776,7 @@ def _(pd, solution):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""where `solution` is the final 2-D mapping and `Y` is our mapped 2-D values at each step of the iteration. Plotting the evolution of `Y` where `Y[-1]` is our final 2-D mapping, we obtain (note how the algorithm behaves with early exaggeration on and off):"""
-    )
+    mo.md(r"""where `solution` is the final 2-D mapping and `Y` is our mapped 2-D values at each step of the iteration. Plotting the evolution of `Y` where `Y[-1]` is our final 2-D mapping, we obtain (note how the algorithm behaves with early exaggeration on and off):""")
     return
 
 
@@ -868,7 +853,7 @@ def _(Y, animation, mo, np, plt, y_reduced):
             fig, animate, frames=len(ys) - 1, interval=350, blit=False
         )
 
-        rot_animation.save("data/MNIST.gif", dpi=200)
+        rot_animation.save("data/MNIST.gif", dpi=300)
 
     tsne_evolution_fig()
     mo.image("data/MNIST.gif", height=500).center()

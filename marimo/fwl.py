@@ -268,7 +268,7 @@ def _(df, mo, plt, sns):
             df.educ, color="g", ax=ax[2, 0], bins=30, stat="proportion", kde=True
         )
         sns.regplot(data=df, x="read", y="educ", color="y", truncate=False, ax=ax[2, 1])
-        plt.savefig("data/data_hists.webp", format="webp", dpi=200)
+        plt.savefig("data/data_hists.webp", format="webp", dpi=300, bbox_inches='tight')
 
     data_hists()
     mo.image("data/data_hists.webp").center()
@@ -277,9 +277,7 @@ def _(df, mo, plt, sns):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""The graph in the bottom right provides the scatter plot and naïve regression line of educ on read. This relationship, on the surface, shows a very strong positive relationship between days read a month as a child and educational attainment. However, we know that by construction this is not the true relationship between educ and read because of the common confounding covariates. We can quantify this result and the bias more formally via regression analysis. Let's now go ahead and estimate the naïve regression (i.e., eq. (3) less $X$), the multiple regression with all relevant covariates (i.e., eq. (3)), and the FWL 3 step process (i.e., eqs. (8)-(12)):"""
-    )
+    mo.md(r"""The graph in the bottom right provides the scatter plot and naïve regression line of educ on read. This relationship, on the surface, shows a very strong positive relationship between days read a month as a child and educational attainment. However, we know that by construction this is not the true relationship between educ and read because of the common confounding covariates. We can quantify this result and the bias more formally via regression analysis. Let's now go ahead and estimate the naïve regression (i.e., eq. (3) less $X$), the multiple regression with all relevant covariates (i.e., eq. (3)), and the FWL 3 step process (i.e., eqs. (8)-(12)):""")
     return
 
 
@@ -364,7 +362,7 @@ def _(df, mo, plt, sns):
         )
         ax[1].set_xlabel("$read^*$")
         ax[1].set_ylabel("$educ^*$")
-        plt.savefig("data/fwl_residual_plot.webp", format="webp", dpi=200)
+        plt.savefig("data/fwl_residual_plot.webp", format="webp", dpi=300, bbox_inches='tight')
 
     fwl_residual_plot()
     mo.image("data/fwl_residual_plot.webp").center()

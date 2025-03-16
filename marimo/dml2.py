@@ -47,7 +47,7 @@ def _():
         plt.xlabel("True effect", fontsize=14)
         plt.ylabel("Predicted effect", fontsize=14)
         plt.legend()
-        plt.savefig(save_path, format="webp", dpi=200)
+        plt.savefig(save_path, format="webp", dpi=300, bbox_inches='tight')
 
     def hist_effect(effect_true, effect_pred, save_path, figsize=(8, 5)):
         plt.figure(figsize=figsize)
@@ -70,8 +70,7 @@ def _():
         )
 
         plt.legend()
-        plt.savefig(save_path, format="webp", dpi=200)
-
+        plt.savefig(save_path, format="webp", dpi=300, bbox_inches='tight')
     return (
         COLORS,
         GradientBoostingClassifier,
@@ -221,9 +220,7 @@ def _(graphviz, mo):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Let’s then simulate this DGP using a similar process as utilized in part 1 (note that all values & data are chosen and generated arbitrarily for demonstrative purposes). Observe that we now include interaction terms in the sales DGP to model the CATE, or treatment effect heterogeneity (note that the DGP in part 1 had no treatment effect heterogeneity by construction)"""
-    )
+    mo.md(r"""Let’s then simulate this DGP using a similar process as utilized in part 1 (note that all values & data are chosen and generated arbitrarily for demonstrative purposes). Observe that we now include interaction terms in the sales DGP to model the CATE, or treatment effect heterogeneity (note that the DGP in part 1 had no treatment effect heterogeneity by construction)""")
     return
 
 
@@ -332,9 +329,7 @@ def _(df):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Now, to estimate our CATE function, as outlined in eq. (4), we can run:"""
-    )
+    mo.md(r"""Now, to estimate our CATE function, as outlined in eq. (4), we can run:""")
     return
 
 
@@ -369,9 +364,7 @@ def _(GradientBoostingRegressor, cross_val_predict, df, smf):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Here we can see that linear DML closely modeled the true DGP for the CATE (see coefficients on interaction terms in sales DGP). Let’s evaluate the performance of our CATE function by comparing the linear DML predictions to the true CATE for a 1 hour increase in time on the spent on the website:"""
-    )
+    mo.md(r"""Here we can see that linear DML closely modeled the true DGP for the CATE (see coefficients on interaction terms in sales DGP). Let’s evaluate the performance of our CATE function by comparing the linear DML predictions to the true CATE for a 1 hour increase in time on the spent on the website:""")
     return
 
 
@@ -409,9 +402,7 @@ def _(
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Plotting the distributions of the predicted CATE and true CATE, we obtain:"""
-    )
+    mo.md(r"""Plotting the distributions of the predicted CATE and true CATE, we obtain:""")
     return
 
 
@@ -425,9 +416,7 @@ def _(hist_effect, linear_dml_cates, mo, true_cates):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Additionally, plotting the predicted values versus the true values we obtain:"""
-    )
+    mo.md(r"""Additionally, plotting the predicted values versus the true values we obtain:""")
     return
 
 
@@ -441,9 +430,7 @@ def _(linear_dml_cates, mo, plot_effect, true_cates):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Overall, we have pretty impressive performance! However, the primary limitation in this approach is that we must manually specify the functional form of the CATE function, thus if we are only including linear interaction terms we may not capture the true CATE function. In our example, we simulated the DGP to only have these linear interaction terms and thus the performance is strong by construction, but let’s see what happens when we tweak the DGP for the CATE to be arbitrarily non-linear:"""
-    )
+    mo.md(r"""Overall, we have pretty impressive performance! However, the primary limitation in this approach is that we must manually specify the functional form of the CATE function, thus if we are only including linear interaction terms we may not capture the true CATE function. In our example, we simulated the DGP to only have these linear interaction terms and thus the performance is strong by construction, but let’s see what happens when we tweak the DGP for the CATE to be arbitrarily non-linear:""")
     return
 
 
@@ -672,9 +659,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Then define the causal loss function as such (note this is just the MSE!):"""
-    )
+    mo.md(r"""Then define the causal loss function as such (note this is just the MSE!):""")
     return
 
 

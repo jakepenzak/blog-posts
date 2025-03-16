@@ -102,7 +102,7 @@ def _(mo, np, plt):
         fig.gca().spines["left"].set_visible(False)
         ax.axhspan(0, -0.25, alpha=0.2, color="black")
         ax.axhspan(1, 1.25, alpha=0.2, color="black")
-        plt.savefig("data/lin_prob_vs_logistic_viz.webp", format="webp", dpi=200)
+        plt.savefig("data/lin_prob_vs_logistic_viz.webp", format="webp", dpi=300, bbox_inches='tight')
 
     lin_prob_vs_logistic_viz()
     mo.image("data/lin_prob_vs_logistic_viz.webp").center()
@@ -275,9 +275,7 @@ def _(pd):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""We will now build a logistic regression model using scikit-learn. Suppose we have already gone through the proper steps in training and validating the model and have determined the appropriate model. Our final model is as follows:"""
-    )
+    mo.md(r"""We will now build a logistic regression model using scikit-learn. Suppose we have already gone through the proper steps in training and validating the model and have determined the appropriate model. Our final model is as follows:""")
     return
 
 
@@ -304,9 +302,7 @@ def _(ColumnTransformer, LogisticRegression, Pipeline, StandardScaler, fraud):
 
 @app.cell
 def _(mo):
-    mo.md(
-        """We have built our logit model to predict if a credit card transaction is fraudulent. Now let's pivot into explaining the model parameters to understand the inner workings of the model and the subsequent role each feature plays in driving predictions. We will define a function to compute the marginal effects of the logistic regression both in terms of probabilities and odds:"""
-    )
+    mo.md("""We have built our logit model to predict if a credit card transaction is fraudulent. Now let's pivot into explaining the model parameters to understand the inner workings of the model and the subsequent role each feature plays in driving predictions. We will define a function to compute the marginal effects of the logistic regression both in terms of probabilities and odds:""")
     return
 
 
@@ -363,7 +359,6 @@ def _(LogisticRegression, np, pd):
         df = pd.DataFrame(marginal_effects)
 
         return df
-
     return (logit_margeff,)
 
 

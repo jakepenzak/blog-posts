@@ -11,6 +11,7 @@ def _():
     import marimo as mo
     import matplotlib.pyplot as plt
     from matplotlib import animation
+    import plotly.graph_objects as go
     import numpy as np
     import sympy as sm
 
@@ -20,7 +21,16 @@ def _():
         os.chdir("assets/articles/notebooks")
     except:
         pass
-    return animation, mo, np, os, plt, sm
+
+
+    def display_iframe(path:str):
+        # Read the saved Plotly HTML file
+        with open(path, "r") as f:
+            html_content = f.read()
+
+        # Display it in Jupyter Notebook
+        return mo.iframe(html_content,height='500px')
+    return animation, display_iframe, go, mo, np, os, plt, sm
 
 
 @app.cell
@@ -115,7 +125,7 @@ def _(mo, np, plt):
         plt.scatter(-1 / 3, 3 * (-1 / 3) ** 2 + 2 * (-1 / 3) - 24, c="black")
         plt.plot(x, y, "r")
 
-        plt.savefig("data/parabola_viz.webp", format="webp", dpi=200)
+        plt.savefig("data/parabola_viz.webp", format="webp", dpi=300, bbox_inches='tight')
 
     parabola_viz()
     mo.image("data/parabola_viz.webp", height=500).center()
@@ -243,7 +253,7 @@ def _(animation, gradient_descent, mo, np, plt, sm):
             fig, animate, frames=len(x_iterations), interval=500
         )
 
-        rot_animation.save("data/gradient_descent.gif", dpi=200)
+        rot_animation.save("data/gradient_descent.gif", dpi=300)
 
     gd_visual()
     mo.image("data/gradient_descent.gif", height=500).center()
@@ -336,34 +346,57 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(animation, mo, np, plt):
+def _(go, mo, np):
     def rosenbrocks_viz_3d():
-        x = np.outer(np.linspace(-10, 10, 50), np.ones(50))
-        y = x.copy().T
-        z = 100 * (y - x**2) ** 2 + (1 - x) ** 2
+        x = np.linspace(-4, 4, 100)
+        y = np.linspace(-4, 4, 100)
+        X, Y = np.meshgrid(x, y)
+        Z = 100 * (Y - X**2) ** 2 + (1 - X) ** 2
 
-        fig = plt.figure()
-        # syntax for 3-D plotting
-        ax = plt.axes(projection="3d")
-        ax.set_xticks([-10, -5, 0, 5, 10])
-        ax.set_yticks([-10, -5, 0, 5, 10])
+        fig = go.Figure()
+        fig.add_trace(go.Surface(
+            z=Z, x=X, y=Y, colorscale="plasma",
+            colorbar=dict(x=-0.15) 
+        ))
 
-        # syntax for plotting
-        ax.plot_surface(x, y, z, cmap="plasma")
-
-        ## Rotating Visualization
-        def rotate(angle):
-            ax.view_init(azim=angle)
-
-        rot_animation = animation.FuncAnimation(
-            fig, rotate, frames=np.arange(0, 362, 2), interval=100
+        # Add the optimum point
+        fig.add_trace(
+            go.Scatter3d(
+                x=[1],
+                y=[1],
+                z=[0],
+                mode='markers',
+                marker=dict(size=8, color='green', symbol='circle'),
+                name='Optimum (1,1)'
+            )
         )
 
-        rot_animation.save("data/rosenbrocks_viz_3d.gif", dpi=200)
+        fig.update_layout(
+            title="Rosenbrock's Parabolic Valley",
+            scene=dict(
+                xaxis_title="X",
+                yaxis_title="Y",
+                zaxis_title="Z",
+                xaxis=dict(tickvals=list(range(-4, 5))),
+                yaxis=dict(tickvals=list(range(-4, 5))),
+            ),
+            showlegend=True,
+            margin=dict(l=0, r=0, b=0, t=40),
+        )
+
+        fig.write_image('data/rosenbrocks_viz_3d.webp', format='webp', scale=5)
+        fig.write_html("data/rosenbrocks_viz_3d.html")
 
     rosenbrocks_viz_3d()
-    mo.image("data/rosenbrocks_viz_3d.gif", height=500).center()
+    mo.image("data/rosenbrocks_viz_3d.webp", height=500).center()
+    # display_iframe("data/rosenbrocks_viz_3d.html")
     return (rosenbrocks_viz_3d,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""[View Interactive Plotly Graph](/articles/notebooks/data/rosenbrocks_viz_3d.html)""")
+    return
 
 
 @app.cell(hide_code=True)
@@ -406,10 +439,10 @@ def _(mo, np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.25))
-        plt.savefig("data/rosenbrocks_viz_contour.webp", format="webp", dpi=200)
+        plt.savefig("data/rosenbrocks_viz_contour.webp", format="webp", dpi=300, bbox_inches='tight')
 
     rosenbrocks_viz_contour()
-    mo.image("data/rosenbrocks_viz_contour.webp", height=500).center()
+    mo.image("data/rosenbrocks_viz_contour.webp", height=600).center()
     return (rosenbrocks_viz_contour,)
 
 
@@ -561,15 +594,12 @@ def _(np, sm):
         hessian = np.array(np.array_split(hessian, len(symbols)))
 
         return hessian
-
     return Gamma, get_gradient_sym, get_hessian_sym, objective, x, y
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""SymPy allows us to investigate the symbolic representation of our equations. For example, if we call `objective` , we will see the corresponding output:"""
-    )
+    mo.md(r"""SymPy allows us to investigate the symbolic representation of our equations. For example, if we call `objective` , we will see the corresponding output:""")
     return
 
 
@@ -581,9 +611,7 @@ def _(objective):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Additionally, SymPy allows us take the derivatives of the respective function utilizing the `sm.diff()` command. If we run our defined functions to obtain the gradient `get_gradient_sym(objective,Gamma)` , we obtain a numpy array representing the gradient:"""
-    )
+    mo.md(r"""Additionally, SymPy allows us take the derivatives of the respective function utilizing the `sm.diff()` command. If we run our defined functions to obtain the gradient `get_gradient_sym(objective,Gamma)` , we obtain a numpy array representing the gradient:""")
     return
 
 
@@ -595,9 +623,7 @@ def _(Gamma, get_gradient_sym, objective):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Accessing a specific element, we can see the symbolic representation `get_gradient_sym(objective, Gamma)[0]` :"""
-    )
+    mo.md(r"""Accessing a specific element, we can see the symbolic representation `get_gradient_sym(objective, Gamma)[0]` :""")
     return
 
 
@@ -609,9 +635,7 @@ def _(Gamma, get_gradient_sym, objective):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Similarly, for the Hessian we can call `get_hessian_sym(objective, Gamma)`:"""
-    )
+    mo.md(r"""Similarly, for the Hessian we can call `get_hessian_sym(objective, Gamma)`:""")
     return
 
 
@@ -635,9 +659,7 @@ def _(Gamma, get_hessian_sym, objective):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""One can easily verify that the gradient and Hessian are identical to the ones we solved out by hand. SymPy allows for the evaluation of any function given specified values for the symbols. For example, we can evaluate the gradient at our initial guess by tweaking the function as follows:"""
-    )
+    mo.md(r"""One can easily verify that the gradient and Hessian are identical to the ones we solved out by hand. SymPy allows for the evaluation of any function given specified values for the symbols. For example, we can evaluate the gradient at our initial guess by tweaking the function as follows:""")
     return
 
 
@@ -695,15 +717,12 @@ def _(np, sm):
         hessian = np.array(np.array_split(hessian, len(symbols)))
 
         return hessian.astype(np.float64)
-
     return get_gradient, get_hessian
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""We can now compute our gradient given our starting point by calling `get_gradient(objective, Gamma, {x:-1.2,y:1.0})`:"""
-    )
+    mo.md(r"""We can now compute our gradient given our starting point by calling `get_gradient(objective, Gamma, {x:-1.2,y:1.0})`:""")
     return
 
 
@@ -715,9 +734,7 @@ def _(Gamma, get_gradient, objective, x, y):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Similarly, for the Hessian `get_hessian(objective, Gamma, {x:-1.2,y:1.0})`:"""
-    )
+    mo.md(r"""Similarly, for the Hessian `get_hessian(objective, Gamma, {x:-1.2,y:1.0})`:""")
     return
 
 
@@ -729,9 +746,7 @@ def _(Gamma, get_hessian, objective, x, y):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Again, we can verify that these values are correct from our work by hand above._ Now we have all the ingredients necessary to code Newton’s method (the code for gradient descent is given at the end of this article as well):"""
-    )
+    mo.md(r"""Again, we can verify that these values are correct from our work by hand above._ Now we have all the ingredients necessary to code Newton’s method (the code for gradient descent is given at the end of this article as well):""")
     return
 
 
@@ -786,15 +801,12 @@ def _(get_gradient, get_hessian, np, sm):
                 print(f"Step {i+1}: {x_star[i+1]}")
 
         return solution
-
     return (newtons_method,)
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""We can now run the code via `newtons_method(objective,Gamma,{x:-1.2,y:1})`:"""
-    )
+    mo.md(r"""We can now run the code via `newtons_method(objective,Gamma,{x:-1.2,y:1})`:""")
     return
 
 
@@ -872,7 +884,6 @@ def _(get_gradient, np, sm):
             print(f"Step {i+1}: {x_star[i+1]}")
 
         return solution, x
-
     return (gradient_descent,)
 
 

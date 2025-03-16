@@ -8,8 +8,7 @@ app = marimo.App(width="medium")
 def _():
     import marimo as mo
     import matplotlib.pyplot as plt
-    from matplotlib import animation
-    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import plotly.graph_objects as go
     import numpy as np
     import sympy as sm
 
@@ -19,7 +18,15 @@ def _():
         os.chdir("assets/articles/notebooks")
     except:
         pass
-    return Poly3DCollection, animation, mo, np, os, plt, sm
+
+    def display_iframe(path:str):
+        # Read the saved Plotly HTML file
+        with open(path, "r") as f:
+            html_content = f.read()
+
+        # Display it in Jupyter Notebook
+        return mo.iframe(html_content,height='500px')
+    return display_iframe, go, mo, np, os, plt, sm
 
 
 @app.cell
@@ -210,7 +217,6 @@ def _(np, sm):
                 print(f"Step {i+1}: {x_star[i+1]}")
 
         return solution
-
     return get_gradient, get_hessian, newtons_method
 
 
@@ -273,50 +279,103 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(animation, mo, np, plt):
+def _(go, mo, np):
     def eqc_rosenbrocks_viz_3d():
-        x = np.outer(np.linspace(-10, 10, 50), np.ones(50))
-        y = x.copy().T
-        z = 100 * (y - x**2) ** 2 + (1 - x) ** 2
+        # Define the Rosenbrock function
+        def rosenbrock(x, y):
+            return 100 * (y - x**2) ** 2 + (1 - x) ** 2
 
-        # Constraint
-        xs = np.linspace(-np.sqrt(12), np.sqrt(12), 500)
-        zs = np.linspace(-1.2e6, 1.2e6, 500)
-        X, Z = np.meshgrid(xs, zs)
-        Y = X**2 - 2
+        # Create the grid
+        x = np.linspace(-4, 4, 100)
+        y = np.linspace(-4, 4, 100)
+        X, Y = np.meshgrid(x, y)
+        Z = rosenbrock(X, Y)
 
-        # Constraint Intersection
-        X2 = np.linspace(-np.sqrt(12), np.sqrt(12), 500)
-        Y2 = X2**2 - 2
-        Z2 = 100 * (Y2 - X2**2) ** 2 + (1 - X2) ** 2
+        # Create constraint curve points
+        x_constraint = np.linspace(-np.sqrt(6), np.sqrt(6), 500)
+        y_constraint = x_constraint**2 - 2
+        z_constraint = rosenbrock(x_constraint, y_constraint)
 
-        fig = plt.figure()
-        # syntax for 3-D plotting
-        ax = plt.axes(projection="3d")
-        ax.set_xticks([-10, -5, 0, 5, 10])
-        ax.set_yticks([-10, -5, 0, 5, 10])
+        # Create the figure
+        fig = go.Figure()
 
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_zlabel("z")
-
-        ax.plot_surface(X, Y, Z, color="lightgreen", alpha=0.7, zorder=3)
-        ax.plot_surface(x, y, z, cmap="plasma", alpha=0.4, zorder=2)
-        ax.scatter(X2, Y2, Z2, color="green", alpha=1, zorder=3)
-
-        # Rotating Visualization
-        def rotate(angle):
-            ax.view_init(azim=angle)
-
-        rot_animation = animation.FuncAnimation(
-            fig, rotate, frames=np.arange(0, 362, 2), interval=100
+        # Add the Rosenbrock surface
+        fig.add_trace(
+            go.Surface(
+                x=X,
+                y=Y,
+                z=Z,
+                colorscale='plasma',
+                opacity=0.8,
+                name='Rosenbrocks Surface',
+                colorbar=dict(x=-0.15),
+                showlegend=True
+            )
         )
 
-        rot_animation.save("data/eqc_rosenbrocks_viz_3d.gif", dpi=200)
+        # Add the constraint curve
+        fig.add_trace(
+            go.Scatter3d(
+                x=x_constraint,
+                y=y_constraint,
+                z=z_constraint,
+                mode='lines',
+                line=dict(color='green', width=5),
+                name='Constraint: y = x^2 - 2; feasible region'
+            )
+        )
+
+        # Add the unconstrained optimum point
+        fig.add_trace(
+            go.Scatter3d(
+                x=[1],
+                y=[1],
+                z=[rosenbrock(1, 1)],
+                mode='markers',
+                marker=dict(size=6, color='red', symbol='cross'),
+                name='Unconstrained Optimum (1,1)'
+            )
+        )
+
+        # Add the constrained optimum point
+        fig.add_trace(
+            go.Scatter3d(
+                x=[1],
+                y=[-1],
+                z=[rosenbrock(1, -1)],
+                mode='markers',
+                marker=dict(size=6, color='green'),
+                name='Constrained Optimum (1,-1)'
+            )
+        )
+
+        # Update the layout
+        fig.update_layout(
+            title='Rosenbrocks Parabolic Valley with Equality Constraints',
+            scene=dict(
+                xaxis_title='X',
+                yaxis_title='Y',
+                zaxis_title='Z',
+                camera=dict(
+                    eye=dict(x=1.5, y=1.5, z=1.5)
+                )
+            ),
+            showlegend=True,
+        )
+
+        fig.write_image('data/eqc_rosenbrocks_viz_3d.webp', format='webp', scale=5)
+        fig.write_html("data/eqc_rosenbrocks_viz_3d.html")
 
     eqc_rosenbrocks_viz_3d()
-    mo.image("data/eqc_rosenbrocks_viz_3d.gif", height=500).center()
+    mo.image("data/eqc_rosenbrocks_viz_3d.webp", height=500).center()
+    # display_iframe("data/eqc_rosenbrocks_viz_3d.html")
     return (eqc_rosenbrocks_viz_3d,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""[View Interactive Plotly Graph](/articles/notebooks/data/eqc_rosenbrocks_viz_3d.html)""")
+    return
 
 
 @app.cell(hide_code=True)
@@ -389,10 +448,10 @@ def _(mo, np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.savefig("data/eqc_rosenbrocks_viz_contour.webp", format="webp", dpi=200)
+        plt.savefig("data/eqc_rosenbrocks_viz_contour.webp", format="webp", dpi=300, bbox_inches='tight')
 
     eqc_rosenbrocks_viz_contour()
-    mo.image("data/eqc_rosenbrocks_viz_contour.webp", height=500).center()
+    mo.image("data/eqc_rosenbrocks_viz_contour.webp", height=600).center()
     return (eqc_rosenbrocks_viz_contour,)
 
 
@@ -498,113 +557,152 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(Poly3DCollection, animation, mo, np, plt):
+def _(go, mo, np):
     def ineqc_rosenbrocks_viz_3d():
-        # Define Rosenbrock function
-        x = np.outer(np.linspace(-10, 10, 50), np.ones(50))
-        y = x.copy().T
-        z = 100 * (y - x**2) ** 2 + (1 - x) ** 2
+        # Define the Rosenbrock function
+        def rosenbrock(x, y):
+            return 100 * (y - x**2) ** 2 + (1 - x) ** 2
 
-        # Constraints
-        # y >= 3
-        xc1 = np.linspace(-10, 10, 15)
-        zc1 = np.linspace(-1.2e6, 1.2e6, 15)
-        XC1, ZC1 = np.meshgrid(xc1, zc1)
-        YC1 = 3  # Horizontal plane
+        # Create the grid
+        x = np.linspace(-4, 4, 100)
+        y = np.linspace(-4, 8, 100)
+        X, Y = np.meshgrid(x, y)
+        Z = rosenbrock(X, Y)
 
-        # x <= 0
-        yc2 = np.linspace(-10, 10, 20)
-        zc2 = np.linspace(-1.2e6, 1.2e6, 20)
-        YC2, ZC2 = np.meshgrid(yc2, zc2)
-        XC2 = 0  # Vertical plane
+        # Create the figure
+        fig = go.Figure()
 
-        fig = plt.figure()
-        ax = plt.axes(projection="3d")
-
-        ax.set_xticks([-10, -5, 0, 5, 10])
-        ax.set_yticks([-10, -5, 0, 5, 10])
-
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_zlabel("z")
-
-        # Plot infeasible region boundaries with transparency
-        ax.plot_surface(XC1, YC1, ZC1, color="black", alpha=0.6)
-        ax.plot_surface(XC2, YC2, ZC2, color="black", alpha=0.6)
-
-        # Plot Rosenbrock function surface
-        ax.plot_surface(x, y, z, cmap="plasma", alpha=0.8)
-
-        # Highlight feasible region
-        # Feasible region vertices (clockwise order)
-        feasible_region = [
-            [-10, 3, float(zc2.min())],  # Bottom-left
-            [0, 3, float(zc2.min())],  # Bottom-right
-            [0, 10, float(zc2.min())],  # Top-right
-            [-10, 10, float(zc2.min())],  # Top-left
-            [-10, 3, float(zc2.max())],  # Upper-bottom-left
-            [0, 3, float(zc2.max())],  # Upper-bottom-right
-            [0, 10, float(zc2.max())],  # Upper-top-right
-            [-10, 10, float(zc2.max())],  # Upper-top-left
-        ]
-
-        # Define faces of the feasible region box
-        faces = [
-            [
-                feasible_region[0],
-                feasible_region[1],
-                feasible_region[2],
-                feasible_region[3],
-            ],  # Bottom face
-            [
-                feasible_region[4],
-                feasible_region[5],
-                feasible_region[6],
-                feasible_region[7],
-            ],  # Top face
-            [
-                feasible_region[0],
-                feasible_region[1],
-                feasible_region[5],
-                feasible_region[4],
-            ],  # Front face
-            [
-                feasible_region[2],
-                feasible_region[3],
-                feasible_region[7],
-                feasible_region[6],
-            ],  # Back face
-            [
-                feasible_region[1],
-                feasible_region[2],
-                feasible_region[6],
-                feasible_region[5],
-            ],  # Right face
-            [
-                feasible_region[0],
-                feasible_region[3],
-                feasible_region[7],
-                feasible_region[4],
-            ],  # Left face
-        ]
-
-        # Add feasible region as a green shaded box
-        feasible_poly = Poly3DCollection(faces, color="lightgreen", alpha=0.4)
-        ax.add_collection3d(feasible_poly)
-
-        # Rotating Visualization
-        def rotate(angle):
-            ax.view_init(azim=angle)
-
-        rot_animation = animation.FuncAnimation(
-            fig, rotate, frames=np.arange(0, 362, 2), interval=100
+        # Add the Rosenbrock surface
+        fig.add_trace(
+            go.Surface(
+                x=X,
+                y=Y,
+                z=Z,
+                colorscale='plasma',
+                opacity=0.8,
+                name='Rosenbrocks Parabolic Valley',
+                colorbar=dict(x=-0.15),
+                showlegend=True
+            )
         )
 
-        rot_animation.save("data/ineqc_rosenbrocks_viz_3d.gif", dpi=200)
+        # Create constraint planes
+        # For x <= 0 constraint
+        yc = np.linspace(-4, 8, 50)
+        zc = np.linspace(0, np.max(Z), 50)
+        YC, ZC = np.meshgrid(yc, zc)
+        XC = np.zeros_like(YC)  # x = 0 plane
+
+        # For y >= 3 constraint
+        xc = np.linspace(-4, 4, 50)
+        zc = np.linspace(0, np.max(Z), 50)
+        XC2, ZC2 = np.meshgrid(xc, zc)
+        YC2 = 3 * np.ones_like(XC2)  # y = 3 plane
+
+        # Add constraint planes
+        fig.add_trace(
+            go.Surface(
+                x=XC,
+                y=YC,
+                z=ZC,
+                colorscale=[[0, 'black'], [1, 'black']],
+                opacity=0.3,
+                name='Constraint: x ≤ 0',
+                showscale=False,
+                showlegend=True,
+            )
+        )
+
+        fig.add_trace(
+            go.Surface(
+                x=XC2,
+                y=YC2,
+                z=ZC2,
+                colorscale=[[0, 'black'], [1, 'black']],
+                opacity=0.6,
+                name='Constraint: y ≥ 3',
+                showscale=False,
+                showlegend=True,
+            )
+        )
+
+        # Add the unconstrained optimum point
+        fig.add_trace(
+            go.Scatter3d(
+                x=[1],
+                y=[1],
+                z=[rosenbrock(1, 1)],
+                mode='markers',
+                marker=dict(size=6, color='red', symbol='cross'),
+                name='Unconstrained Optimum (1,1)'
+            )
+        )
+
+        # Add the constrained optimum point (approximately at -1.73, 3)
+        fig.add_trace(
+            go.Scatter3d(
+                x=[-1.73],
+                y=[3],
+                z=[rosenbrock(-1.73, 3)],
+                mode='markers',
+                marker=dict(size=6, color='green'),
+                name='Constrained Optimum (-1.73,3)'
+            )
+        )
+
+        # Define box edges for feasible region
+        box_edges = [
+            [-4, 3, 0], [-4, 3, np.max(Z)], [0, 3, np.max(Z)], [0, 3, 0],
+            [-4, 8, 0], [-4, 8, np.max(Z)], [0, 8, np.max(Z)], [0, 8, 0]
+        ]
+        box_faces = [
+            (0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (2, 3, 7, 6), (0, 3, 7, 4), (1, 2, 6, 5)
+        ]
+
+        for i, face in enumerate(box_faces):
+            x = [box_edges[i][0] for i in face] + [box_edges[face[0]][0]]
+            y = [box_edges[i][1] for i in face] + [box_edges[face[0]][1]]
+            z = [box_edges[i][2] for i in face] + [box_edges[face[0]][2]]
+
+            if i == 0:
+                show_legend=True
+            else:
+                show_legend=False
+
+            fig.add_trace(
+                go.Scatter3d(
+                    x=x, y=y, z=z, mode='lines', name="Feasible Region",
+                    line=dict(color='lightgreen', width=4), showlegend=show_legend
+                )
+            )
+
+        # Update the layout
+        fig.update_layout(
+            title='Rosenbrocks Parabolic Valley with Inequality Constraints',
+            scene=dict(
+                xaxis_title='X',
+                yaxis_title='Y',
+                zaxis_title='Z',
+                camera=dict(
+                    eye=dict(x=1.5, y=1.5, z=1.5)
+                )
+            ),
+            showlegend=True
+        )
+
+        fig.write_html("data/ineqc_rosenbrocks_viz_3d.html")
+        fig.write_image('data/ineqc_rosenbrocks_viz_3d.webp', format='webp', scale=5)
 
     ineqc_rosenbrocks_viz_3d()
-    mo.image("data/ineqc_rosenbrocks_viz_3d.gif", height=500).center()
+    mo.image("data/ineqc_rosenbrocks_viz_3d.webp", height=500).center()
+    # display_iframe("data/ineqc_rosenbrocks_viz_3d.html")
     return (ineqc_rosenbrocks_viz_3d,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""[View Interactive Plotly Graph](/articles/notebooks/data/ineqc_rosenbrocks_viz_3d.html)""")
+    return
 
 
 @app.cell(hide_code=True)
@@ -682,10 +780,10 @@ def _(mo, np, plt):
         plt.ylabel("Y")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.savefig("data/ineqc_rosenbrocks_viz_contour.webp", format="webp", dpi=200)
+        plt.savefig("data/ineqc_rosenbrocks_viz_contour.webp", format="webp", dpi=300, bbox_inches='tight')
 
     ineqc_rosenbrocks_viz_contour()
-    mo.image("data/ineqc_rosenbrocks_viz_contour.webp", height=500).center()
+    mo.image("data/ineqc_rosenbrocks_viz_contour.webp", height=600).center()
     return (ineqc_rosenbrocks_viz_contour,)
 
 
@@ -746,7 +844,7 @@ def _(mo, np, plt):
         plt.plot(x, y, "r")
         plt.plot(x, y2, "g")
 
-        plt.savefig("data/logarithmic_barrier_function.webp", format="webp", dpi=200)
+        plt.savefig("data/logarithmic_barrier_function.webp", format="webp", dpi=300)
 
     logarithmic_barrier_function()
     mo.image("data/logarithmic_barrier_function.webp", height=500).center()
@@ -850,15 +948,12 @@ def _(newtons_method, np, sm):
             )
 
         return overall_solution
-
     return (constrained_newtons_method,)
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""We can now solve the Barrier function with the code above (Note: Make sure starting values are in the feasible range of inequality constraints & you may have to increase the starting value of rho if you jump out of inequality constraints):"""
-    )
+    mo.md(r"""We can now solve the Barrier function with the code above (Note: Make sure starting values are in the feasible range of inequality constraints & you may have to increase the starting value of rho if you jump out of inequality constraints):""")
     return
 
 

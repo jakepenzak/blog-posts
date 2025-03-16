@@ -7,9 +7,11 @@ requires-python = ">=3.10"
 dependencies = [
     "econml>=0.15.1",
     "graphviz>=0.20.3",
+    "kaleido<0.2.1",
     "matplotlib>=3.10.0",
     "numpy>=1.26.4",
     "pandas>=2.2.3",
+    "plotly>=6.0.0",
     "scikit-learn>=1.5.2",
     "scipy>=1.14.1",
     "seaborn>=0.13.2",
@@ -22,6 +24,7 @@ dependencies = [
 [tool.ruff]
 extend-include = ["*.ipynb"]
 ignore = ["E722"]
+exclude = ["marimo/"]
 
 [dependency-groups]
 dev = [

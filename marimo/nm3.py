@@ -11,8 +11,8 @@ def _():
     import marimo as mo
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mtick
-    from matplotlib import animation
     from matplotlib.ticker import FuncFormatter
+    import plotly.graph_objects as go
     import numpy as np
     import sympy as sm
     from itertools import cycle
@@ -25,10 +25,19 @@ def _():
         os.chdir("assets/articles/notebooks")
     except:
         pass
+
+    def display_iframe(path:str):
+        # Read the saved Plotly HTML file
+        with open(path, "r") as f:
+            html_content = f.read()
+
+        # Display it in Jupyter Notebook
+        return mo.iframe(html_content,height='500px')
     return (
         FuncFormatter,
-        animation,
         cycle,
+        display_iframe,
+        go,
         mo,
         mtick,
         np,
@@ -309,7 +318,6 @@ def _(np, sm):
             )
 
         return overall_solution
-
     return (
         constrained_newtons_method,
         get_gradient,
@@ -444,7 +452,7 @@ def _(mo, np, plt):
         plt.xlabel("Digital Advertising", size="large")
         plt.ylabel("Quantity Demanded", size="large")
 
-        plt.savefig("data/saturation_plot.webp", format="webp", dpi=200)
+        plt.savefig("data/saturation_plot.webp", format="webp", dpi=300, bbox_inches="tight")
 
     saturation_plot()
     mo.image("data/saturation_plot.webp", height=500).center()
@@ -566,9 +574,7 @@ def _(df):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Note that we include lag variables because it is highly plausible that today’s quantity demanded is a function of lagged values for many of the variables. We also control for seasonality effects by incorporation dummy variables for each month (this is one of many ways to incorporate seasonality into the model). We then specify the parameters associated with each variable as (note that these parameters are specified in the same order as the columns of the dataframe!):"""
-    )
+    mo.md(r"""Note that we include lag variables because it is highly plausible that today’s quantity demanded is a function of lagged values for many of the variables. We also control for seasonality effects by incorporation dummy variables for each month (this is one of many ways to incorporate seasonality into the model). We then specify the parameters associated with each variable as (note that these parameters are specified in the same order as the columns of the dataframe!):""")
     return
 
 
@@ -749,7 +755,7 @@ def _(T, mo, mtick, np, plt, quantity_demanded_ar):
         plt.xlabel("Years", size="large")
         plt.ylabel("Quantity Demanded", size="large")
 
-        plt.savefig("data/quantity_demanded_plot.webp", format="webp", dpi=200)
+        plt.savefig("data/quantity_demanded_plot.webp", format="webp", dpi=300, bbox_inches="tight")
 
     quantity_demanded_plot()
     mo.image("data/quantity_demanded_plot.webp", height=500).center()
@@ -758,9 +764,7 @@ def _(T, mo, mtick, np, plt, quantity_demanded_ar):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""We can clearly see some seasonality occurring towards the end of the years and it appears we are dealing with a [stationary process](https://en.wikipedia.org/wiki/Stationary_process) (this is all by construction). Now suppose that we have the following observed variables:"""
-    )
+    mo.md(r"""We can clearly see some seasonality occurring towards the end of the years and it appears we are dealing with a [stationary process](https://en.wikipedia.org/wiki/Stationary_process) (this is all by construction). Now suppose that we have the following observed variables:""")
     return
 
 
@@ -900,17 +904,13 @@ def _(df, np, results, sm):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""$\hat{q}(\delta,\tau,\cdot) = 10071.2795746647*\log(δ) + 6219.99261508067*\log(τ) + 21336.8117838209$"""
-    )
+    mo.md(r"""$\hat{q}(\delta,\tau,\cdot) = 10071.2795746647*\log(δ) + 6219.99261508067*\log(τ) + 21336.8117838209$""")
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Now we can construct our revenue, cost, and put them together to construct our profit function. Here our cost to produce each unit is $140 base and is discounted by $0.0001 for each additional unit produced:"""
-    )
+    mo.md(r"""Now we can construct our revenue, cost, and put them together to construct our profit function. Here our cost to produce each unit is $140 base and is discounted by $0.0001 for each additional unit produced:""")
     return
 
 
@@ -924,82 +924,131 @@ def _(price, quantity_demanded, δ, τ):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""$\pi(\delta,\tau,\cdot) = -δ - τ - (-1.00712795746647*\log(δ) - 0.621999261508067*\log(τ) + 137.866318821618)*(10071.2795746647*\log(δ) + 6219.99261508067*\log(τ) + 21336.8117838209) + 1812830.32343965*\log(δ) + 1119598.67071452*\log(τ) + 3840626.12108775$"""
-    )
+    mo.md(r"""$\pi(\delta,\tau,\cdot) = -δ - τ - (-1.00712795746647*\log(δ) - 0.621999261508067*\log(τ) + 137.866318821618)*(10071.2795746647*\log(δ) + 6219.99261508067*\log(τ) + 21336.8117838209) + 1812830.32343965*\log(δ) + 1119598.67071452*\log(τ) + 3840626.12108775$""")
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Plotting our profit as a function of digital ad spend and television ad spend, $π(\delta, \tau)$:"""
-    )
+    mo.md(r"""Plotting our profit as a function of digital ad spend and television ad spend, $π(\delta, \tau)$:""")
     return
 
 
 @app.cell(hide_code=True)
-def _(FuncFormatter, animation, mo, np, plt):
+def _(go, mo, np, profit, δ, τ):
     def profit_function_viz_3d():
         def log(x):
             return np.log(x)
 
-        # Defining surface and axes
-        τ = np.outer(np.linspace(0.01, 100000, 1000), np.ones(1000))
-        δ = np.outer(np.linspace(0.01, 100000, 1000), np.ones(1000)).T
+        # Create meshgrid for surface
+        δ_vals = np.linspace(0.01, 100000, 100)
+        τ_vals = np.linspace(0.01, 100000, 100)
+        δ_mesh, τ_mesh = np.meshgrid(δ_vals, τ_vals)
 
-        profit_function = (
-            -δ
-            - τ
-            - (
-                -1.00712795746647 * log(δ)
-                - 0.621999261508067 * log(τ)
-                + 138.264406731209
-            )
-            * (10071.2795746647 * log(δ) + 6219.99261508067 * log(τ) + 17355.9326879056)
-            + 1812830.32343965 * log(δ)
-            + 1119598.67071452 * log(τ)
-            + 3124067.88382301
+        def profit_fn(δ, τ):
+
+            return (-δ - τ - 
+            (-1.00712795746647 * log(δ) - 0.621999261508067 * log(τ) + 137.866318821618) * 
+            (10071.2795746647 * log(δ) + 6219.99261508067 * log(τ) + 21336.8117838209) + 
+            1812830.32343965 * log(δ) + 1119598.67071452 * log(τ) + 3840626.12108775)
+
+        # Calculate profit values
+        profit_vals = profit_fn(δ_mesh, τ_mesh)
+
+        # Create surface plot
+        surface = go.Surface(
+            x=δ_mesh.tolist(),
+            y=τ_mesh.tolist(),
+            z=profit_vals.tolist(),
+            colorscale='plasma',
+            name='Profit Surface',
+            colorbar=dict(x=-0.15),
+            showlegend=True
         )
 
-        fig = plt.figure()
-        ax = plt.axes(projection="3d")
-        ax.set_xlabel(r"$\tau $", fontsize="xx-large")
-        ax.set_ylabel(r"$\delta $", fontsize="xx-large")
-        ax.set_zlabel(r"$\pi $", fontsize="xx-large")
+        # Create budget constraint line
+        budget_x = np.linspace(0.01, 99_999, 100)
+        budget_y = 100000 - budget_x
+        budget_z = profit_fn(budget_x, budget_y)
 
-        def thousands(x, pos):
-            "The two args are the value and tick position"
-            return "$%1.0fK" % (x * 1e-3)
-
-        formatter = FuncFormatter(thousands)
-        ax.yaxis.set_major_formatter(formatter)
-        ax.xaxis.set_major_formatter(formatter)
-
-        def millions(x, pos):
-            "The two args are the value and tick position"
-            return "$%1.0fM" % (x * 1e-6)
-
-        formatter = FuncFormatter(millions)
-
-        ax.zaxis.set_major_formatter(formatter)
-
-        # syntax for plotting
-        ax.plot_surface(τ, δ, profit_function, cmap="plasma")
-
-        # Rotating Visualization
-        def rotate(angle):
-            ax.view_init(azim=angle)
-
-        rot_animation = animation.FuncAnimation(
-            fig, rotate, frames=np.arange(0, 362, 2), interval=100
+        budget_line = go.Scatter3d(
+            x=budget_x.tolist(),
+            y=budget_y.tolist(),
+            z=budget_z.tolist(),
+            mode='lines',
+            line=dict(color='green', width=5),
+            name='Budget Constraint'
         )
 
-        rot_animation.save("data/profit_function_viz_3d.gif", dpi=200)
+        # Create minimum constraints
+        min_δ_x = np.ones(100) * 10000
+        min_δ_y = np.linspace(0.01, 100000, 100)
+        min_δ_z = profit_fn(min_δ_x,min_δ_y)
+
+        min_δ_line = go.Scatter3d(
+            x=min_δ_x.tolist(),
+            y=min_δ_y.tolist(),
+            z=min_δ_z.tolist(),
+            mode='lines',
+            line=dict(color='red', width=5),
+            name='Min Digital Ad Spend'
+        )
+
+        min_τ_x = np.linspace(0.01, 100000, 100)
+        min_τ_y = np.ones(100) * 20000
+        min_τ_z = profit_fn(min_τ_x,min_τ_y)
+
+        min_τ_line = go.Scatter3d(
+            x=min_τ_x.tolist(),
+            y=min_τ_y.tolist(),
+            z=min_τ_z.tolist(),
+            mode='lines',
+            line=dict(color='blue', width=5),
+            name='Min TV Ad Spend'
+        )
+
+        # Add optimal point
+        optimal_z = float(profit.evalf(subs={δ: 61820, τ: 38180}))
+        optimal_point = go.Scatter3d(
+            x=[61820],
+            y=[38180],
+            z=[optimal_z],
+            mode='markers',
+            marker=dict(size=6, color='green'),
+            name='Optimal Point'
+        )
+
+        # Create figure
+        fig = go.Figure(data=[surface, budget_line, min_δ_line, min_τ_line, optimal_point])
+
+        # Update layout
+        fig.update_layout(
+            title='Profit Function with Constraints',
+            scene = dict(
+                xaxis_title='Digital Ad Spend (δ)',
+                yaxis_title='TV Ad Spend (τ)',
+                zaxis_title='Profit (π)',
+                camera=dict(
+                    eye=dict(x=1.5, y=1.5, z=1.5)
+                )
+            ),
+            showlegend=True
+        )
+
+        # Save the figure
+        fig.write_html("data/profit_function_3d.html")
+        fig.write_image('data/profit_function_3d.webp', format='webp', scale=5)
 
     profit_function_viz_3d()
-    mo.image("data/profit_function_viz_3d.gif", height=500).center()
+    mo.image("data/profit_function_3d.webp", height=500).center()
+    # display_iframe("data/profit_function_3d.html")
     return (profit_function_viz_3d,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""[View Interactive Plotly Graph](/articles/notebooks/data/profit_function_3d.html)""")
+    return
 
 
 @app.cell(hide_code=True)
@@ -1093,7 +1142,7 @@ def _(mo, np, plt):
         plt.ylabel(r"$\tau$")
         plt.title("Contour Representation")
         plt.legend(loc="lower center", bbox_to_anchor=(0.5, -0.4))
-        plt.savefig("data/profit_function_viz_contour.webp", format="webp", dpi=200)
+        plt.savefig("data/profit_function_viz_contour.webp", format="webp", dpi=300, bbox_inches='tight')
 
     profit_function_viz_contour()
     mo.image("data/profit_function_viz_contour.webp", height=500).center()
@@ -1102,9 +1151,7 @@ def _(mo, np, plt):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Let’s now solve our optimization problem as formulated in eq. 12 via python using the optimization theory that we have learned from part 1 and part 2 of this series. _Note that the extremely high value of $\rho$ is to account for the fact that the values of our objective function are extremely large thus we need to make sure penalization is large enough to avoid “jumping” out of constraints - we could normalize values for more stability._"""
-    )
+    mo.md(r"""Let’s now solve our optimization problem as formulated in eq. 12 via python using the optimization theory that we have learned from part 1 and part 2 of this series. _Note that the extremely high value of $\rho$ is to account for the fact that the values of our objective function are extremely large thus we need to make sure penalization is large enough to avoid “jumping” out of constraints - we could normalize values for more stability._""")
     return
 
 
@@ -1126,9 +1173,7 @@ def _(constrained_newtons_method, profit, sm, δ, λ, ρ, τ):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Thus, our solution is to spend ~61,800 on digital ad spend and ~38,200 on television ad spend. These values correspond to:"""
-    )
+    mo.md(r"""Thus, our solution is to spend ~61,800 on digital ad spend and ~38,200 on television ad spend. These values correspond to:""")
     return
 
 

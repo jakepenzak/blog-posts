@@ -229,9 +229,7 @@ def _(graphviz, mo):
 
 @app.cell
 def _(mo):
-    mo.md(
-        """Let the data generating process be as follows (_note that all values & data are chosen and generated arbitrarily for demonstrative purposes, and thus should not necessarily represent a large degree of real world intuition per se outside of our estimates of the ATE_):"""
-    )
+    mo.md("""Let the data generating process be as follows (_note that all values & data are chosen and generated arbitrarily for demonstrative purposes, and thus should not necessarily represent a large degree of real world intuition per se outside of our estimates of the ATE_):""")
     return
 
 
