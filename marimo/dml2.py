@@ -636,7 +636,7 @@ def _(mo):
         \begin{align*}
         \mathscr{L}(\tau(\mathbf{X})) 
         &= \frac{1}{N}\sum_{i=1}^N\bigl(\tilde{y}_i - \tau(\mathbf{X}_i)\tilde{T}_i\bigr)^2 \\
-        &= \frac{1}{N}\sum_{i=1}^N\bigl(\tilde{y}_i - \tau(\mathbf{X}_i)\tilde{T}_i\bigr)^2
+        &= \frac{1}{N}\sum_{i=1}^N\tilde{T}_i^2\bigl(\frac{\tilde{y}_i}{\tilde{T}_i} - \tau(\mathbf{X}_i)\bigr)^2
         \end{align*}
         $$
 
@@ -760,6 +760,11 @@ def _(mo):
         </center>
         """
     )
+    return
+
+
+@app.cell
+def _():
     return
 
 

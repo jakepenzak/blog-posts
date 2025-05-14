@@ -18,15 +18,13 @@ These articles were developed using [Marimo](https://marimo.io/). We also provid
 
 1. Clone repo to local machine 
 1. Install [uv](https://docs.astral.sh/uv/)
-1. Create environment via `uv sync --frozen`    
+1. Create environment via `uv sync --all-extras --all-groups --frozen`
 
 ### Marimo
 
-1. Run `uv sync --group marimo --frozen`
 1. Run `marimo edit` to open the Marimo editor and navigate to the article you want to interact with under `marimo/`
 
 ### Jupyter
 
-1. Run `uv sync --group jupyter --frozen`
 1. Run `jupyter notebook` to open the jupyter notebook and navigate to the article you want to interact with under `jupyter/`
 
